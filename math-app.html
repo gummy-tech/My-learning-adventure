@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4D96FF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Leer Avontuur">
+<meta name="description" content="Leer rekenen en taal op een leuke manier!">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Leer Avontuur!</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--green:#6BCB77;--blue:#4D96FF;--red:#FF6B6B;--purple:#C77DFF;--orange:#FF9A3C;--dark:#2D2D2D;--teal:#2EC4B6;--pink:#FF8FAB;--yellow:#FFD93D;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:linear-gradient(180deg,#87CEEB 0%,#B0E2FF 40%,#FFF8E7 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:14px 12px 60px;overflow-x:hidden;}
+
+/* CLOUDS */
+.clouds{position:fixed;top:0;left:0;right:0;height:200px;pointer-events:none;z-index:0;overflow:hidden;}
+.cloud{position:absolute;background:white;border-radius:50px;opacity:.85;animation:drift linear infinite;}
+.cloud::before,.cloud::after{content:'';position:absolute;background:white;border-radius:50%;}
+.c1{width:100px;height:40px;top:20px;animation-duration:30s;}.c1::before{width:55px;height:55px;top:-25px;left:15px;}.c1::after{width:40px;height:40px;top:-18px;left:45px;}
+.c2{width:130px;height:45px;top:60px;animation-duration:45s;animation-delay:-10s;}.c2::before{width:65px;height:65px;top:-30px;left:20px;}.c2::after{width:50px;height:50px;top:-22px;left:60px;}
+.c3{width:80px;height:30px;top:10px;animation-duration:35s;animation-delay:-20s;}.c3::before{width:45px;height:45px;top:-20px;left:10px;}.c3::after{width:35px;height:35px;top:-15px;left:38px;}
+@keyframes drift{from{transform:translateX(-200px)}to{transform:translateX(110vw)}}
+
+/* ONBOARDING */
+#onboarding{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#87CEEB,#B0E2FF,#FFF8E7);padding:20px;}
+.ob-card{background:white;border-radius:32px;padding:32px 24px 28px;width:100%;max-width:400px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.18);}
+.ob-title{font-family:'Baloo 2',cursive;font-size:2.2rem;font-weight:800;color:var(--dark);margin-bottom:4px;}
+.ob-sub{color:#888;font-size:1rem;font-weight:700;margin-bottom:20px;}
+.ob-step{display:none;}.ob-step.active{display:block;}
+.ob-name-input{width:100%;border:4px solid #E0E0E0;border-radius:16px;padding:14px 16px;font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:700;text-align:center;color:var(--dark);outline:none;background:#FAFAFA;transition:border-color .2s;margin-bottom:16px;}
+.ob-name-input:focus{border-color:var(--blue);}
+.av-preview-wrap{position:relative;display:inline-block;margin:8px 0;}
+.av-preview-hat{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:1.8rem;pointer-events:none;line-height:1;}
+.av-preview-acc{position:absolute;right:-22px;top:50%;transform:translateY(-50%);font-size:1.5rem;pointer-events:none;line-height:1;}
+.ob-section-title{font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1px;margin:12px 0 7px;}
+.av-grid{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:4px;}
+.av-opt{font-size:1.9rem;width:44px;height:44px;border-radius:11px;border:3px solid transparent;background:#F5F5F5;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.av-opt:hover{transform:scale(1.1);}
+.av-opt.sel{border-color:var(--purple);background:#F7F0FF;transform:scale(1.15);box-shadow:0 4px 10px rgba(199,125,255,.3);}
+.av-color-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:4px;}
+.av-color{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .15s;}
+.av-color:hover{transform:scale(1.15);}
+.av-color.sel{border-color:var(--dark);transform:scale(1.2);box-shadow:0 3px 8px rgba(0,0,0,.2);}
+.ob-btn{width:100%;border:none;border-radius:16px;padding:13px;font-family:'Baloo 2',cursive;font-size:1.15rem;font-weight:700;cursor:pointer;color:white;background:var(--blue);box-shadow:0 5px 0 #2D6ACC;transition:transform .1s;margin-top:10px;}
+.ob-btn:hover{transform:translateY(-2px);}
+.ob-btn:active{transform:translateY(2px);}
+.ob-btn.green{background:var(--green);box-shadow:0 5px 0 #4CAF50;}
+.ob-btn.gray{background:#aaa;box-shadow:0 4px 0 #888;}
+.ob-dots{display:flex;gap:8px;justify-content:center;margin-top:14px;}
+.ob-dot{width:10px;height:10px;border-radius:50%;background:#E0E0E0;transition:background .2s;}
+.ob-dot.active{background:var(--blue);}
+
+/* HEADER */
+header{position:relative;z-index:1;text-align:center;margin-bottom:8px;width:100%;max-width:460px;}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.header-title h1{font-family:'Baloo 2',cursive;font-size:clamp(1.4rem,5.5vw,2.2rem);font-weight:800;color:white;text-shadow:3px 3px 0 #FF9A3C,5px 5px 0 rgba(0,0,0,.1);line-height:1.1;text-align:left;}
+.header-title p{font-size:.85rem;color:#2D5FA3;font-weight:700;text-align:left;}
+.profile-badge{background:white;border-radius:20px;padding:6px 12px 6px 8px;display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(0,0,0,.14);cursor:pointer;transition:transform .15s;flex-shrink:0;}
+.profile-badge:hover{transform:scale(1.04);}
+.profile-badge .pb-avatar{font-size:1.6rem;line-height:1;position:relative;}
+.profile-badge .pb-hat{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:.8rem;line-height:1;pointer-events:none;}
+.profile-badge .pb-name{font-family:'Baloo 2',cursive;font-weight:800;font-size:.85rem;color:var(--dark);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* SCOREBAR */
+.scorebar{position:relative;z-index:1;display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;justify-content:center;}
+.badge{background:white;border-radius:18px;padding:7px 13px;display:flex;align-items:center;gap:5px;font-weight:800;font-size:.95rem;box-shadow:0 4px 12px rgba(0,0,0,.12);}
+.badge .icon{font-size:1.1rem;}
+.score-val{color:var(--blue);}.coins-val{color:#C8940A;}
+
+/* NAV */
+.nav-tabs{position:relative;z-index:1;display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;justify-content:center;}
+.nav-tab{border:none;border-radius:12px;padding:7px 10px;font-family:'Baloo 2',cursive;font-size:.82rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.65);color:#555;box-shadow:0 3px 0 rgba(0,0,0,.1);transition:all .15s;}
+.nav-tab.active{background:white;color:var(--dark);box-shadow:0 4px 12px rgba(0,0,0,.15);transform:translateY(-2px);}
+.nav-tab:hover:not(.active){background:rgba(255,255,255,.88);}
+
+/* PANELS */
+.panel{display:none;width:100%;max-width:460px;}
+.panel.active{display:block;}
+.card{position:relative;z-index:1;background:white;border-radius:24px;padding:20px 18px 18px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.13);text-align:center;}
+
+/* REKENEN */
+.character{font-size:2.8rem;line-height:1;margin-bottom:4px;display:inline-block;animation:bounce 2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.character.celebrate{animation:spin .5s ease forwards;}
+@keyframes spin{0%{transform:scale(1)rotate(0)}50%{transform:scale(1.3)rotate(15deg)}100%{transform:scale(1)rotate(0)}}
+.op-selector{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;justify-content:center;}
+.op-btn{border:none;border-radius:13px;padding:7px 11px;font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.15);color:white;transition:transform .15s,box-shadow .15s;}
+.op-btn:hover{transform:translateY(-2px);}
+.op-btn:active{transform:translateY(2px);}
+.op-btn.add{background:var(--green);}.op-btn.sub{background:var(--blue);}.op-btn.mul{background:var(--purple);}.op-btn.div{background:var(--orange);}
+.op-btn.active{outline:4px solid #2D2D2D;outline-offset:2px;}
+.op-label{font-size:.8rem;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.question{font-family:'Baloo 2',cursive;font-size:clamp(1.8rem,7.5vw,2.6rem);font-weight:800;color:var(--dark);margin:5px 0;line-height:1.2;}
+.answer-input{width:100%;border:4px solid #E0E0E0;border-radius:13px;padding:10px;font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:700;text-align:center;color:var(--dark);outline:none;background:#FAFAFA;transition:border-color .2s;}
+.answer-input:focus{border-color:var(--blue);}
+.answer-input.correct{border-color:var(--green);background:#F0FFF4;}
+.answer-input.wrong{border-color:var(--red);background:#FFF0F0;animation:shake .4s;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px;}
+.num-btn{border:none;border-radius:11px;background:#F0F4FF;color:var(--dark);font-family:'Baloo 2',cursive;font-size:1.35rem;font-weight:700;padding:10px 0;cursor:pointer;box-shadow:0 3px 0 #D0D8F0;transition:transform .1s,background .1s;}
+.num-btn:hover{background:#DDE6FF;transform:translateY(-1px);}
+.num-btn:active{transform:translateY(2px);}
+.num-btn.zero{grid-column:span 2;}
+.num-btn.del{background:#FFE8E8;box-shadow:0 3px 0 #FFCCCC;color:var(--red);}
+.num-btn.go{grid-column:span 3;background:var(--green);color:white;font-size:1.15rem;box-shadow:0 4px 0 #4CAF50;}
+.num-btn.go:hover{background:#5CB85C;}
+.feedback{min-height:26px;font-size:1.05rem;font-weight:800;margin-top:9px;}
+.feedback.correct{color:var(--green);}.feedback.wrong{color:var(--red);}.feedback.empty{opacity:0;}
+.next-btn{display:none;border:none;border-radius:13px;background:var(--blue);color:white;font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:700;padding:10px;cursor:pointer;margin-top:9px;box-shadow:0 4px 0 #2D6ACC;width:100%;}
+.next-btn:hover{transform:translateY(-2px);}
+.next-btn.visible{display:block;}
+.stars{display:flex;justify-content:center;gap:4px;margin-top:5px;font-size:1.1rem;min-height:24px;}
+.star{animation:popIn .3s cubic-bezier(.36,.07,.19,.97) forwards;}
+@keyframes popIn{from{transform:scale(0)rotate(-30deg)}to{transform:scale(1)rotate(0)}}
+
+/* LEVEL SELECTOR */
+.level-selector{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap;}
+.lvl-btn{border:none;border-radius:12px;padding:6px 12px;font-family:'Baloo 2',cursive;font-size:.82rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.7);color:#666;box-shadow:0 3px 0 rgba(0,0,0,.12);transition:all .15s;display:flex;align-items:center;gap:4px;}
+.lvl-btn:hover:not(.active){background:rgba(255,255,255,.95);transform:translateY(-1px);}
+.lvl-btn.active.l1{background:var(--green);color:white;box-shadow:0 3px 0 #4CAF50;}
+.lvl-btn.active.l2{background:var(--blue);color:white;box-shadow:0 3px 0 #2D6ACC;}
+.lvl-btn.active.l3{background:var(--orange);color:white;box-shadow:0 3px 0 #CC7A30;}
+.lvl-btn.active.l4{background:var(--red);color:white;box-shadow:0 3px 0 #CC4444;}
+.lvl-btn .lvl-stars{font-size:.7rem;}
+.level-badge{display:inline-block;font-size:.72rem;font-weight:800;border-radius:8px;padding:2px 8px;margin-left:6px;color:white;vertical-align:middle;}
+.level-badge.l1{background:var(--green);}.level-badge.l2{background:var(--blue);}.level-badge.l3{background:var(--orange);}.level-badge.l4{background:var(--red);}
+
+/* TAAL */
+.taal-mode-selector{display:flex;gap:5px;margin-bottom:9px;flex-wrap:wrap;justify-content:center;}
+.tmode-btn{border:none;border-radius:11px;padding:6px 10px;font-family:'Baloo 2',cursive;font-size:.78rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.7);color:#555;box-shadow:0 3px 0 rgba(0,0,0,.12);transition:all .15s;}
+.tmode-btn.active{background:var(--purple);color:white;box-shadow:0 3px 0 #9B4DC7;transform:translateY(-1px);}
+.tmode-btn:hover:not(.active){background:rgba(255,255,255,.95);}
+.taal-cat-selector{display:flex;gap:5px;margin-bottom:11px;flex-wrap:wrap;justify-content:center;}
+.tcat-btn{border:none;border-radius:11px;padding:6px 9px;font-family:'Baloo 2',cursive;font-size:.78rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.7);color:#555;box-shadow:0 3px 0 rgba(0,0,0,.12);transition:all .15s;}
+.tcat-btn.active{background:var(--teal);color:white;box-shadow:0 3px 0 rgba(0,0,0,.15);transform:translateY(-1px);}
+.tcat-btn:hover:not(.active){background:rgba(255,255,255,.95);}
+.word-emoji{font-size:2.8rem;margin-bottom:4px;display:block;animation:bounce 2s ease-in-out infinite;}
+.word-hint{font-size:.93rem;color:#555;font-weight:700;margin-bottom:10px;font-style:italic;}
+.word-display{display:flex;gap:5px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0 12px;}
+.letter-box{min-width:32px;height:40px;padding:0 4px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:800;transition:all .15s;}
+.letter-box.known{background:#F0F4FF;border:3px solid #D0D8F0;color:var(--dark);}
+.letter-box.blank-empty{background:white;border:3px dashed #C77DFF;color:#ccc;cursor:pointer;}
+.letter-box.blank-empty:hover{background:#F8F0FF;border-color:#A855D8;transform:translateY(-2px);}
+.letter-box.blank-selected{background:#F0E8FF;border:3px solid var(--purple);color:var(--purple);cursor:pointer;transform:translateY(-3px);box-shadow:0 4px 10px rgba(199,125,255,.3);}
+.letter-box.blank-correct{background:#F0FFF4;border:3px solid var(--green);color:var(--green);}
+.letter-box.blank-wrong{background:#FFF0F0;border:3px solid var(--red);color:var(--red);cursor:pointer;animation:shake .3s;}
+.letter-box.dash{background:transparent;border:none;color:#aaa;font-size:1.1rem;min-width:14px;}
+.alpha-pad{margin-top:8px;}
+.alpha-row{display:flex;gap:4px;justify-content:center;margin-bottom:4px;}
+.alpha-btn{border:none;border-radius:8px;background:#F0F4FF;color:var(--dark);font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;width:30px;height:34px;cursor:pointer;box-shadow:0 3px 0 #D0D8F0;display:flex;align-items:center;justify-content:center;transition:transform .1s,background .1s;}
+.alpha-btn:hover:not(:disabled){background:#DDE6FF;transform:translateY(-1px);}
+.alpha-btn:disabled{opacity:.4;cursor:not-allowed;}
+.alpha-btn.used-c{background:#D4F5DC;color:var(--green);box-shadow:0 2px 0 #A8E6B4;}
+.taal-action-btn{width:100%;margin-top:8px;border:none;border-radius:13px;color:white;font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:700;padding:11px;cursor:pointer;transition:transform .1s;}
+.taal-action-btn:hover{transform:translateY(-1px);}
+.taal-action-btn:disabled{opacity:.5;cursor:default;}
+.taal-action-btn.check{background:var(--teal);box-shadow:0 4px 0 #1A9E96;}
+.taal-action-btn.next{background:var(--blue);box-shadow:0 4px 0 #2D6ACC;}
+.hint-bar{margin-top:5px;font-size:.8rem;color:#999;font-weight:700;}
+
+/* Spelling / verb / cap exercises */
+.spell-cat-badge{display:inline-block;font-family:'Baloo 2',cursive;font-size:.85rem;font-weight:800;background:#F0E8FF;color:var(--purple);border-radius:14px;padding:5px 14px;margin-bottom:12px;}
+.spell-question{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;color:var(--dark);margin-bottom:14px;line-height:1.3;}
+.spell-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.spell-options.three{grid-template-columns:1fr 1fr 1fr;}
+.spell-opt{border:3px solid #E0E0E0;border-radius:14px;padding:14px 8px;font-family:'Baloo 2',cursive;font-size:1.15rem;font-weight:800;cursor:pointer;background:white;color:var(--dark);transition:all .15s;}
+.spell-opt:hover:not(:disabled){border-color:var(--purple);background:#F8F0FF;transform:translateY(-2px);}
+.spell-opt:active:not(:disabled){transform:translateY(1px);}
+.spell-opt.correct{border-color:var(--green);background:#F0FFF4;color:var(--green);}
+.spell-opt.wrong{border-color:var(--red);background:#FFF0F0;color:var(--red);animation:shake .3s;}
+.spell-opt:disabled{cursor:not-allowed;}
+
+.verb-sentence{font-family:'Baloo 2',cursive;font-size:1.5rem;font-weight:800;color:var(--dark);margin:16px 0 14px;line-height:1.4;}
+.verb-blank{display:inline-block;min-width:50px;border-bottom:4px dashed var(--purple);padding:0 6px;color:var(--purple);font-weight:800;}
+.verb-blank.filled{border-bottom-style:solid;color:var(--dark);}
+.verb-blank.correct{border-bottom-color:var(--green);color:var(--green);}
+.verb-blank.wrong{border-bottom-color:var(--red);color:var(--red);}
+.verb-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0 0 10px;}
+.verb-opt{border:3px solid #E0E0E0;border-radius:14px;padding:18px 0;font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;cursor:pointer;background:white;color:var(--dark);transition:all .15s;letter-spacing:2px;}
+.verb-opt:hover:not(:disabled){border-color:var(--purple);background:#F8F0FF;transform:translateY(-2px);}
+.verb-opt.correct{border-color:var(--green);background:#F0FFF4;color:var(--green);}
+.verb-opt.wrong{border-color:var(--red);background:#FFF0F0;color:var(--red);animation:shake .3s;}
+.verb-opt:disabled{cursor:not-allowed;}
+.verb-rule{background:#FFF8E0;border-radius:12px;padding:10px 14px;font-size:.85rem;font-weight:700;color:#7A5C00;margin-top:8px;border:2px dashed #FFD93D;display:none;text-align:left;}
+.verb-rule.show{display:block;}
+
+.cap-sentence{font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:700;color:var(--dark);margin:18px 0 8px;line-height:1.7;text-align:left;}
+.cap-word{display:inline-block;padding:2px 6px;border-radius:8px;cursor:pointer;transition:all .15s;border:2px solid transparent;}
+.cap-word:hover{background:#F0E8FF;}
+.cap-word.selected{background:#F0E8FF;border-color:var(--purple);color:var(--purple);font-weight:800;}
+.cap-word.correct{background:#F0FFF4;border-color:var(--green);color:var(--green);font-weight:800;}
+.cap-word.wrong{background:#FFF0F0;border-color:var(--red);color:var(--red);font-weight:800;}
+.cap-word.missed{background:#FFF8E0;border-color:#FFD93D;color:#7A5C00;font-weight:800;}
+.cap-hint{font-size:.82rem;font-weight:700;color:#999;margin-bottom:12px;text-align:center;}
+
+/* SHOP */
+.shop-section{margin-bottom:14px;}
+.shop-section h2,.shop-sub-section h2{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;color:var(--dark);margin-bottom:8px;}
+.shop-sub-section{margin-top:14px;}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;}
+.slot-label{grid-column:1/-1;font-weight:800;font-size:.75rem;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.shop-item{background:white;border-radius:15px;padding:11px 7px 9px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.1);border:3px solid transparent;transition:all .2s;cursor:pointer;position:relative;}
+.shop-item:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.14);}
+.shop-item.owned{border-color:var(--green);background:#F2FFF5;}
+.shop-item.equipped{border-color:var(--purple);background:#F7F0FF;}
+.item-emoji{font-size:2rem;display:block;margin-bottom:3px;}
+.item-name{font-weight:800;font-size:.75rem;color:var(--dark);line-height:1.2;margin-bottom:2px;}
+.item-price{font-family:'Baloo 2',cursive;font-weight:700;font-size:.8rem;color:#C8940A;}
+.top-badge{position:absolute;top:4px;right:4px;font-size:.6rem;font-weight:800;border-radius:7px;padding:2px 5px;color:white;}
+.top-badge.green{background:var(--green);}.top-badge.purple{background:var(--purple);}
+
+/* MY PET SCENE */
+.my-pet-box{background:white;border-radius:22px;padding:16px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.12);margin-bottom:14px;}
+.my-pet-box h2{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;margin-bottom:8px;color:var(--dark);}
+.no-pet-msg{color:#aaa;font-weight:700;font-size:.95rem;padding:16px 0;}
+.scene-world{position:relative;width:100%;border-radius:14px;overflow:hidden;margin-bottom:10px;cursor:pointer;}
+#petCanvas{width:100%;height:auto;display:block;}
+.scene-tap-hint{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:.72rem;font-weight:800;color:rgba(255,255,255,.9);background:rgba(0,0,0,.2);border-radius:20px;padding:3px 10px;pointer-events:none;white-space:nowrap;transition:opacity .5s;}
+.scene-tap-hint.hidden{opacity:0;}
+.interact-btns{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px;}
+.int-btn{border:none;border-radius:13px;padding:8px 13px;font-family:'Baloo 2',cursive;font-size:.88rem;font-weight:700;cursor:pointer;color:white;box-shadow:0 3px 0 rgba(0,0,0,.15);transition:all .15s;}
+.int-btn:hover{transform:translateY(-2px);}
+.int-btn:active{transform:translateY(1px);}
+.int-btn.feed{background:var(--orange);box-shadow:0 3px 0 #CC7A30;}
+.int-btn.play{background:var(--green);box-shadow:0 3px 0 #4CAF50;}
+.int-btn.hug{background:var(--pink);box-shadow:0 3px 0 #D46585;}
+.int-btn.trick{background:var(--purple);box-shadow:0 3px 0 #9B4DC7;}
+.int-btn.praise{background:var(--blue);box-shadow:0 3px 0 #2D6ACC;}
+.int-result{min-height:24px;font-size:.93rem;font-weight:800;color:var(--purple);margin-top:7px;text-align:center;}
+.pet-mood{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
+.mood-bar-wrap{background:#F0F0F0;border-radius:20px;height:12px;width:140px;overflow:hidden;}
+.mood-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),var(--yellow));transition:width .5s;}
+.mood-label{font-size:.78rem;font-weight:800;color:#888;}
+
+/* PROFILE */
+.profile-card{background:white;border-radius:24px;padding:20px 18px;box-shadow:0 8px 28px rgba(0,0,0,.13);margin-bottom:14px;text-align:center;}
+.profile-card h2{font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:800;margin-bottom:12px;color:var(--dark);}
+.avatar-stage{position:relative;display:inline-block;margin:6px 0 4px;}
+.avatar-stage .av-body{font-size:5rem;display:block;line-height:1;animation:bounce 2s ease-in-out infinite;}
+.avatar-stage .av-hat{position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:2rem;pointer-events:none;line-height:1;}
+.avatar-stage .av-accessory{position:absolute;right:-26px;top:50%;transform:translateY(-50%);font-size:1.8rem;pointer-events:none;line-height:1;}
+.player-name-display{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:800;color:var(--purple);margin-top:4px;}
+.profile-stats{display:flex;gap:10px;justify-content:center;margin:12px 0;flex-wrap:wrap;}
+.pstat{background:#F5F7FF;border-radius:14px;padding:8px 16px;text-align:center;}
+.pstat .pstat-num{font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:800;color:var(--blue);}
+.pstat .pstat-lbl{font-size:.72rem;font-weight:700;color:#888;text-transform:uppercase;}
+.edit-profile-btn{border:none;border-radius:13px;background:var(--purple);color:white;font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:700;padding:9px 18px;cursor:pointer;box-shadow:0 4px 0 #9B4DC7;transition:transform .1s;margin-top:4px;}
+.edit-profile-btn:hover{transform:translateY(-2px);}
+.av-customizer{background:#F8F0FF;border-radius:18px;padding:14px;margin-top:12px;}
+.av-customizer h3{font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:var(--purple);margin-bottom:8px;}
+.av-section-lbl{font-size:.76rem;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px;text-align:left;}
+
+/* TOAST + CONFETTI */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:#2D2D2D;color:white;border-radius:15px;padding:10px 18px;font-weight:800;font-size:.9rem;z-index:300;transition:transform .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden;}
+.confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{from{transform:translateY(-20px) rotate(0);opacity:1}to{transform:translateY(110vh) rotate(720deg);opacity:.3}}
+</style>
+</head>
+<body>
+
+<div class="clouds">
+  <div class="cloud c1" style="left:-120px"></div>
+  <div class="cloud c2" style="left:-160px"></div>
+  <div class="cloud c3" style="left:-100px"></div>
+</div>
+<div class="confetti-wrap" id="confetti"></div>
+<div class="toast" id="toast"></div>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-card">
+    <div class="ob-title">🌟 Leer Avontuur!</div>
+    <div class="ob-sub">Maak jouw profiel aan</div>
+    <div class="ob-step active" id="ob-step1">
+      <div style="font-size:3.2rem;margin-bottom:10px">👋</div>
+      <div style="font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;color:#555;margin-bottom:12px">Hoe heet jij?</div>
+      <input class="ob-name-input" id="obNameInput" type="text" placeholder="Jouw naam..." maxlength="14" autocomplete="off">
+      <button class="ob-btn green" onclick="obNext1()">Verder ➡️</button>
+    </div>
+    <div class="ob-step" id="ob-step2">
+      <div style="font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:#555;margin-bottom:6px">Kies jouw avatar!</div>
+      <div class="av-preview-wrap">
+        <span id="obPreviewBody" style="font-size:4.5rem;display:block;animation:bounce 2s ease-in-out infinite;line-height:1;">🧒</span>
+        <span class="av-preview-hat" id="obPreviewHat"></span>
+        <span class="av-preview-acc" id="obPreviewAcc"></span>
+      </div>
+      <div class="ob-section-title">Personage</div>
+      <div class="av-grid" id="obBodyGrid"></div>
+      <div class="ob-section-title">Huidkleur</div>
+      <div class="av-color-row" id="obSkinRow"></div>
+      <button class="ob-btn" onclick="obNext2()">Verder ➡️</button>
+      <button class="ob-btn gray" onclick="obSetStep(1)">← Terug</button>
+    </div>
+    <div class="ob-step" id="ob-step3">
+      <div style="font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:#555;margin-bottom:6px">Versier je avatar!</div>
+      <div class="av-preview-wrap">
+        <span id="obPreviewBody2" style="font-size:4.5rem;display:block;animation:bounce 2s ease-in-out infinite;line-height:1;">🧒</span>
+        <span class="av-preview-hat" id="obPreviewHat2"></span>
+        <span class="av-preview-acc" id="obPreviewAcc2"></span>
+      </div>
+      <div class="ob-section-title">Hoed (optioneel)</div>
+      <div class="av-grid" id="obHatGrid"></div>
+      <div class="ob-section-title">Accessoire (optioneel)</div>
+      <div class="av-grid" id="obAccGrid"></div>
+      <button class="ob-btn green" onclick="obFinish()">🎉 Klaar!</button>
+      <button class="ob-btn gray" onclick="obSetStep(2)">← Terug</button>
+    </div>
+    <div class="ob-dots">
+      <div class="ob-dot active" id="dot1"></div>
+      <div class="ob-dot" id="dot2"></div>
+      <div class="ob-dot" id="dot3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<header>
+  <div class="header-row">
+    <div class="header-title">
+      <h1>🌟 Leer Avontuur!</h1>
+      <p>Oefening baart kunst!</p>
+    </div>
+    <div class="profile-badge" onclick="showPanel('profiel',document.querySelector('[data-panel=profiel]'))">
+      <div class="pb-avatar">
+        <span id="hdrAvatarBody">🧒</span>
+        <span class="pb-hat" id="hdrAvatarHat"></span>
+      </div>
+      <div class="pb-name" id="hdrName">...</div>
+    </div>
+  </div>
+</header>
+
+<div class="scorebar">
+  <div class="badge"><span class="icon">⭐</span> Score: <span class="score-val" id="scoreVal">0</span></div>
+  <div class="badge"><span class="icon">🪙</span> <span class="coins-val" id="coinsVal">0</span></div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" data-panel="quiz"    onclick="showPanel('quiz',this)">🧮 Rekenen</button>
+  <button class="nav-tab"        data-panel="taal"    onclick="showPanel('taal',this)">📖 Taal</button>
+  <button class="nav-tab"        data-panel="shop"    onclick="showPanel('shop',this)">🏪 Winkel</button>
+  <button class="nav-tab"        data-panel="mypet"   onclick="showPanel('mypet',this)">🐾 Huisdier</button>
+  <button class="nav-tab"        data-panel="profiel" onclick="showPanel('profiel',this)">👤 Profiel</button>
+</div>
+
+<!-- REKENEN -->
+<div class="panel active" id="panel-quiz">
+  <div class="op-selector">
+    <button class="op-btn add active" onclick="setOp('add',this)">➕ Optellen</button>
+    <button class="op-btn sub"        onclick="setOp('sub',this)">➖ Aftrekken</button>
+    <button class="op-btn mul"        onclick="setOp('mul',this)">✖️ Vermenigvuldigen</button>
+    <button class="op-btn div"        onclick="setOp('div',this)">➗ Delen</button>
+  </div>
+  <div class="card">
+    <span class="character" id="qChar">🦊</span>
+    <div class="op-label" id="opLabel">Optelling</div>
+    <div class="question" id="question">_ + _ = ?</div>
+    <input class="answer-input" id="answerInput" type="number" placeholder="?" readonly>
+    <div class="stars" id="qStars"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="numPress('7')">7</button>
+      <button class="num-btn" onclick="numPress('8')">8</button>
+      <button class="num-btn" onclick="numPress('9')">9</button>
+      <button class="num-btn" onclick="numPress('4')">4</button>
+      <button class="num-btn" onclick="numPress('5')">5</button>
+      <button class="num-btn" onclick="numPress('6')">6</button>
+      <button class="num-btn" onclick="numPress('1')">1</button>
+      <button class="num-btn" onclick="numPress('2')">2</button>
+      <button class="num-btn" onclick="numPress('3')">3</button>
+      <button class="num-btn zero" onclick="numPress('0')">0</button>
+      <button class="num-btn del"  onclick="numDel()">⌫</button>
+      <button class="num-btn go"   id="goBtn" onclick="checkMath()">✔ CONTROLEER!</button>
+    </div>
+    <div class="feedback empty" id="qFeedback"></div>
+    <button class="next-btn" id="qNextBtn" onclick="nextMath()">Volgende Vraag ➡️</button>
+  </div>
+</div>
+
+<!-- TAAL -->
+<div class="panel" id="panel-taal">
+  <!-- Type selector -->
+  <div class="taal-mode-selector" id="taalModes"></div>
+
+  <!-- Exercise: Fill in blanks -->
+  <div class="card" id="taalCardFill">
+    <span class="word-emoji" id="wordEmoji">🐘</span>
+    <div class="word-hint" id="wordHint"></div>
+    <div class="word-display" id="wordDisplay"></div>
+    <div class="hint-bar" id="hintBar"></div>
+    <div class="alpha-pad">
+      <div id="alphaRows"></div>
+      <button class="taal-action-btn check" id="taalCheckBtn" onclick="checkWord()" disabled>✔ CONTROLEER!</button>
+      <button class="taal-action-btn next"  id="taalNextBtn"  onclick="nextWord()" style="display:none">Volgende Woord ➡️</button>
+    </div>
+    <div class="feedback empty" id="tFeedback"></div>
+    <div class="stars" id="tStars"></div>
+  </div>
+
+  <!-- Exercise: Spelling — choose correct spelling from options -->
+  <div class="card" id="taalCardSpell" style="display:none">
+    <div class="spell-cat-badge" id="spellCatBadge"></div>
+    <div class="spell-question" id="spellQuestion">Welk woord is goed gespeld?</div>
+    <div class="spell-options" id="spellOptions"></div>
+    <div class="feedback empty" id="sFeedback"></div>
+    <button class="taal-action-btn next" id="spellNextBtn" onclick="nextSpell()" style="display:none">Volgende ➡️</button>
+  </div>
+
+  <!-- Exercise: -d / -t / -dt — verb endings -->
+  <div class="card" id="taalCardVerb" style="display:none">
+    <div class="spell-cat-badge">✍️ Werkwoorden: d, t of dt?</div>
+    <div class="verb-sentence" id="verbSentence">Hij wand_ in het park.</div>
+    <div class="verb-options">
+      <button class="verb-opt" data-end="d"  onclick="answerVerb('d',this)">D</button>
+      <button class="verb-opt" data-end="t"  onclick="answerVerb('t',this)">T</button>
+      <button class="verb-opt" data-end="dt" onclick="answerVerb('dt',this)">DT</button>
+    </div>
+    <div class="verb-rule" id="verbRule"></div>
+    <div class="feedback empty" id="vFeedback"></div>
+    <button class="taal-action-btn next" id="verbNextBtn" onclick="nextVerb()" style="display:none">Volgende ➡️</button>
+  </div>
+
+  <!-- Exercise: Hoofdletter — capitalization -->
+  <div class="card" id="taalCardCap" style="display:none">
+    <div class="spell-cat-badge">🔠 Hoofdletter of niet?</div>
+    <div class="cap-sentence" id="capSentence"></div>
+    <div class="cap-hint" id="capHint">Tik op de woorden die met een hoofdletter moeten beginnen</div>
+    <div class="feedback empty" id="cFeedback"></div>
+    <button class="taal-action-btn check" id="capCheckBtn" onclick="checkCap()">✔ CONTROLEER!</button>
+    <button class="taal-action-btn next" id="capNextBtn" onclick="nextCap()" style="display:none">Volgende ➡️</button>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div class="panel" id="panel-shop">
+  <div class="shop-section">
+    <h2>🐾 Huisdieren kopen</h2>
+    <div class="shop-grid" id="petsGrid"></div>
+  </div>
+  <div class="shop-section" id="accSection" style="display:none">
+    <h2>🎀 Accessoires voor <span id="accPetLabel"></span></h2>
+    <div class="shop-grid" id="accGrid"></div>
+  </div>
+</div>
+
+<!-- MY PET -->
+<div class="panel" id="panel-mypet">
+  <!-- no pet state -->
+  <div id="petShowcase" style="display:none">
+    <div style="background:white;border-radius:22px;padding:32px 20px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.12);">
+      <div style="font-size:3rem;margin-bottom:10px">🐾</div>
+      <div style="font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;color:#aaa;">Je hebt nog geen huisdier!</div>
+      <div style="font-size:.9rem;color:#bbb;margin-top:6px;">Ga naar de <strong>Winkel</strong> om er een te kopen.</div>
+    </div>
+  </div>
+
+  <!-- main scene -->
+  <div id="petScene" style="display:none">
+    <!-- scene canvas -->
+    <div style="position:relative;border-radius:20px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.18);margin-bottom:12px;">
+      <canvas id="petCanvas" style="width:100%;display:block;"></canvas>
+      <div id="sceneTapHint" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:.72rem;font-weight:800;color:rgba(255,255,255,.95);background:rgba(0,0,0,.25);border-radius:20px;padding:3px 12px;pointer-events:none;white-space:nowrap;transition:opacity .6s;">
+        👆 Tik op het huisdier!
+      </div>
+      <!-- time-of-day toggle -->
+      <button id="timeBtn" onclick="toggleTime()" style="position:absolute;top:8px;right:8px;border:none;border-radius:12px;padding:4px 10px;font-size:.8rem;font-weight:800;cursor:pointer;background:rgba(255,255,255,.7);color:#444;transition:all .2s;">🌙 Nacht</button>
+    </div>
+
+    <!-- mood bar -->
+    <div style="background:white;border-radius:16px;padding:10px 16px;box-shadow:0 4px 14px rgba(0,0,0,.1);margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.4rem;" id="moodEmoji">😊</span>
+      <div style="flex:1;">
+        <div style="font-family:'Baloo 2',cursive;font-size:.82rem;font-weight:800;color:#888;margin-bottom:4px;">Blijheid</div>
+        <div style="background:#F0F0F0;border-radius:20px;height:14px;overflow:hidden;">
+          <div id="moodBar" style="width:60%;height:100%;border-radius:20px;background:linear-gradient(90deg,#6BCB77,#FFD93D);transition:width .6s,background .6s;"></div>
+        </div>
+      </div>
+      <div id="moodPct" style="font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;color:var(--green);min-width:36px;text-align:right;">60%</div>
+    </div>
+
+    <!-- interaction buttons - Tamagotchi style -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;">
+      <button class="int-btn feed"   onclick="interact('feed')"   style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">🍪</span><span style="font-size:.7rem;font-weight:800;">Voeren</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">🪙 5</span>
+      </button>
+      <button class="int-btn" onclick="interact('drink')" style="background:#4DC4FF;box-shadow:0 3px 0 #2D8ACC;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">💧</span><span style="font-size:.7rem;font-weight:800;">Drinken</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">🪙 3</span>
+      </button>
+      <button class="int-btn" onclick="interact('bath')" style="background:var(--teal);box-shadow:0 3px 0 #1A9E96;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">🛁</span><span style="font-size:.7rem;font-weight:800;">Wassen</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">🪙 8</span>
+      </button>
+      <button class="int-btn play"   onclick="interact('play')"   style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">🎾</span><span style="font-size:.7rem;font-weight:800;">Spelen</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">🪙 4</span>
+      </button>
+      <button class="int-btn" onclick="interact('walk')" style="background:#8B6F47;box-shadow:0 3px 0 #5D4A30;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">🚶</span><span style="font-size:.7rem;font-weight:800;">Wandelen</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">🪙 6</span>
+      </button>
+      <button class="int-btn" onclick="interact('outside')" style="background:#9DCD5A;box-shadow:0 3px 0 #6B9E2D;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">🌳</span><span style="font-size:.7rem;font-weight:800;">Buiten</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">🪙 4</span>
+      </button>
+      <button class="int-btn hug"    onclick="interact('hug')"    style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">🤗</span><span style="font-size:.7rem;font-weight:800;">Knuffel</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">Gratis</span>
+      </button>
+      <button class="int-btn" onclick="interact('sleep')" style="background:#7B6FCF;box-shadow:0 3px 0 #5544A0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">😴</span><span style="font-size:.7rem;font-weight:800;">Slapen</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">Gratis</span>
+      </button>
+      <button class="int-btn praise" onclick="interact('praise')" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px;">
+        <span style="font-size:1.5rem;">⭐</span><span style="font-size:.7rem;font-weight:800;">Prijzen</span><span style="font-size:.62rem;color:rgba(255,255,255,.85);">Gratis</span>
+      </button>
+    </div>
+
+    <!-- last action -->
+    <div id="interactResult" style="text-align:center;font-weight:800;font-size:.95rem;color:var(--purple);min-height:22px;margin-bottom:10px;"></div>
+
+    <!-- accessories quick-equip -->
+    <div id="myAccSection" style="display:none">
+      <div style="font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;color:var(--dark);margin-bottom:8px;">🎀 Accessoires aan/uit</div>
+      <div class="shop-grid" id="myAccGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFIEL -->
+<div class="panel" id="panel-profiel">
+  <div class="profile-card">
+    <h2>👤 Mijn Profiel</h2>
+    <div class="avatar-stage">
+      <span class="av-body"      id="profileBody">🧒</span>
+      <span class="av-hat"       id="profileHat"></span>
+      <span class="av-accessory" id="profileAcc"></span>
+    </div>
+    <div class="player-name-display" id="profileName">...</div>
+    <div class="profile-stats">
+      <div class="pstat"><div class="pstat-num" id="statScore">0</div><div class="pstat-lbl">Score</div></div>
+      <div class="pstat"><div class="pstat-num" id="statCoins">0</div><div class="pstat-lbl">Munten</div></div>
+      <div class="pstat"><div class="pstat-num" id="statPet">–</div><div class="pstat-lbl">Huisdier</div></div>
+    </div>
+    <button class="edit-profile-btn" onclick="toggleCustomizer()">✏️ Avatar aanpassen</button>
+  </div>
+  <div class="av-customizer" id="avatarCustomizer" style="display:none">
+    <h3>✨ Avatar aanpassen</h3>
+    <div class="av-section-lbl">Personage</div><div class="av-grid" id="custBodyGrid"></div>
+    <div class="av-section-lbl">Huidkleur</div><div class="av-color-row" id="custSkinRow"></div>
+    <div class="av-section-lbl">Hoed</div><div class="av-grid" id="custHatGrid"></div>
+    <div class="av-section-lbl">Accessoire</div><div class="av-grid" id="custAccGrid"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  AVATAR DATA
+// ═══════════════════════════════════════
+const AV_BODIES=['🧒','👦','👧','🧑','👱','🧔','👩','🧕','🧙','🧝','🧜','🦸','🧚','🧞','🧛'];
+const AV_SKINS=['#FDDBB4','#F5CFA0','#E8B88A','#C68642','#8D5524','#FFCBCB','#C2E0FF','#D4F5DC','#E8D5FF','#FFE0B2'];
+const AV_SKIN_NAMES=['Licht 1','Licht 2','Warm','Bruin','Donker','Roze','Blauw','Groen','Paars','Oranje'];
+const AV_HATS=[{e:'',n:'Geen'},{e:'🎩',n:'Hoge Hoed'},{e:'🤠',n:'Cowboy'},{e:'👑',n:'Kroon'},{e:'🎓',n:'Diploma'},{e:'⛑️',n:'Helm'},{e:'🎅',n:'Kerstmuts'},{e:'🧢',n:'Pet'},{e:'🪖',n:'Militair'},{e:'🎪',n:'Clown'}];
+const AV_ACCS=[{e:'',n:'Geen'},{e:'⭐',n:'Ster'},{e:'🎵',n:'Muziek'},{e:'❤️',n:'Hart'},{e:'🌈',n:'Regenboog'},{e:'🔥',n:'Vuur'},{e:'💎',n:'Diamant'},{e:'🦋',n:'Vlinder'},{e:'🌸',n:'Bloem'},{e:'⚡',n:'Bliksem'},{e:'🎀',n:'Strik'},{e:'🏆',n:'Trofee'}];
+
+// ═══════════════════════════════════════
+//  SHARED STATE
+// ═══════════════════════════════════════
+let playerName='';
+let avatar={bodyIdx:0,skinColor:'#FDDBB4',hatIdx:0,accIdx:0};
+let score=0, coins=0, petMood=60;
+
+function updateScorebar(){
+  document.getElementById('scoreVal').textContent=score;
+  document.getElementById('coinsVal').textContent=coins;
+}
+function addCorrect(pts){ score+=pts; coins+=5; updateScorebar(); try{saveGame();}catch(e){} }
+function addWrong(){ updateScorebar(); }
+function changeMood(d){ petMood=Math.max(0,Math.min(100,petMood+d)); updateMoodBar(); try{saveGame();}catch(e){} }
+function updateMoodBar(){
+  const bar=document.getElementById('moodBar');
+  const em=document.getElementById('moodEmoji');
+  const pct=document.getElementById('moodPct');
+  if(!bar||!em) return;
+  bar.style.width=petMood+'%';
+  bar.style.background=petMood>70?'linear-gradient(90deg,#6BCB77,#FFD93D)':petMood>40?'linear-gradient(90deg,#FFD93D,#FF9A3C)':'linear-gradient(90deg,#FF6B6B,#FF9A3C)';
+  em.textContent=petMood>80?'😄':petMood>60?'😊':petMood>40?'😐':petMood>20?'😟':'😢';
+  if(pct) pct.textContent=petMood+'%';
+}
+
+// ═══════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════
+function showPanel(id,btn){
+  // stop canvas when leaving mypet
+  if(id!=='mypet' && sceneLoop){ cancelAnimationFrame(sceneLoop); sceneLoop=null; }
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='shop')    renderShop();
+  if(id==='mypet')   renderMyPet();
+  if(id==='profiel'){ refreshProfileStats(); }
+}
+function refreshProfileStats(){
+  document.getElementById('statScore').textContent=score;
+  document.getElementById('statCoins').textContent=coins;
+  document.getElementById('statPet').textContent=activePet?PETS.find(p=>p.id===activePet).emoji:'–';
+}
+
+// ═══════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════
+let _tt;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),2200); }
+function doConfetti(){
+  const w=document.getElementById('confetti');
+  const cols=['#FFD93D','#6BCB77','#4D96FF','#FF6B6B','#C77DFF','#FF9A3C'];
+  for(let i=0;i<26;i++) setTimeout(()=>{ const el=document.createElement('div'); el.className='confetti-piece'; el.style.left=Math.random()*100+'vw'; el.style.top='-12px'; el.style.background=cols[Math.floor(Math.random()*cols.length)]; el.style.animationDuration=(1.3+Math.random())+'s'; el.style.animationDelay=Math.random()*0.4+'s'; el.style.borderRadius=Math.random()>.5?'50%':'2px'; w.appendChild(el); setTimeout(()=>el.remove(),2200); },i*28);
+}
+function showStars(id){ const c=document.getElementById(id); c.innerHTML=''; for(let i=0;i<3;i++) setTimeout(()=>{ const s=document.createElement('span'); s.className='star'; s.textContent='⭐'; s.style.animationDelay=`${i*80}ms`; c.appendChild(s); },i*80); }
+function pickMsg(){ return ['🎉 Geweldig!','🌟 Goed gedaan!','🎊 Schitterend!','🔥 Superster!','🦄 Fantastisch!','💪 Zo kan het!','👏 Uitstekend!'][Math.floor(Math.random()*7)]; }
+function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+// ═══════════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════════
+let obBody=0, obSkin='#FDDBB4', obHat=0, obAcc=0;
+
+function obSetStep(n){
+  for(let i=1;i<=3;i++){
+    document.getElementById('ob-step'+i).classList.toggle('active',i===n);
+    document.getElementById('dot'+i).classList.toggle('active',i===n);
+  }
+  buildObGrids(); updateObPreview();
+}
+function buildObGrids(){
+  buildSimpleGrid('obBodyGrid',AV_BODIES,obBody,i=>{obBody=i;buildObGrids();updateObPreview();});
+  buildColorRow('obSkinRow',AV_SKINS,obSkin,c=>{obSkin=c;buildObGrids();updateObPreview();});
+  buildSelectGrid('obHatGrid',AV_HATS,obHat,i=>{obHat=i;buildObGrids();updateObPreview();});
+  buildSelectGrid('obAccGrid',AV_ACCS,obAcc,i=>{obAcc=i;buildObGrids();updateObPreview();});
+}
+function buildSimpleGrid(id,arr,selIdx,cb){ const g=document.getElementById(id); if(!g)return; g.innerHTML=''; arr.forEach((v,i)=>{ const d=document.createElement('div'); d.className='av-opt'+(i===selIdx?' sel':''); d.textContent=v; d.onclick=()=>cb(i); g.appendChild(d); }); }
+function buildColorRow(id,arr,selVal,cb){ const g=document.getElementById(id); if(!g)return; g.innerHTML=''; arr.forEach((c,i)=>{ const d=document.createElement('div'); d.className='av-color'+(c===selVal?' sel':''); d.style.background=c; d.title=AV_SKIN_NAMES[i]; d.onclick=()=>cb(c); g.appendChild(d); }); }
+function buildSelectGrid(id,arr,selIdx,cb){ const g=document.getElementById(id); if(!g)return; g.innerHTML=''; arr.forEach((v,i)=>{ const d=document.createElement('div'); d.className='av-opt'+(i===selIdx?' sel':''); d.textContent=v.e||'🚫'; d.title=v.n; d.onclick=()=>cb(i); g.appendChild(d); }); }
+function updateObPreview(){
+  const body=AV_BODIES[obBody], hat=AV_HATS[obHat].e, acc=AV_ACCS[obAcc].e;
+  ['obPreviewBody','obPreviewBody2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=body;});
+  ['obPreviewHat','obPreviewHat2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=hat;});
+  ['obPreviewAcc','obPreviewAcc2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=acc;});
+}
+function obNext1(){ const v=document.getElementById('obNameInput').value.trim(); if(!v){ document.getElementById('obNameInput').style.borderColor='var(--red)'; return; } playerName=v; obSetStep(2); }
+function obNext2(){ obSetStep(3); }
+function obFinish(){
+  avatar={bodyIdx:obBody,skinColor:obSkin,hatIdx:obHat,accIdx:obAcc};
+  document.getElementById('onboarding').style.display='none';
+  applyProfile(); nextMath(); initTaal();
+  saveGame();
+  toast(`Welkom, ${playerName}! 🎉`);
+}
+
+// ═══════════════════════════════════════
+//  PROFILE / AVATAR
+// ═══════════════════════════════════════
+function applyProfile(){
+  const body=AV_BODIES[avatar.bodyIdx]||'🧒';
+  const hat=AV_HATS[avatar.hatIdx]?.e||'';
+  const acc=AV_ACCS[avatar.accIdx]?.e||'';
+  document.getElementById('hdrAvatarBody').textContent=body;
+  document.getElementById('hdrAvatarHat').textContent=hat;
+  document.getElementById('hdrName').textContent=playerName;
+  document.getElementById('profileBody').textContent=body;
+  document.getElementById('profileHat').textContent=hat;
+  document.getElementById('profileAcc').textContent=acc;
+  document.getElementById('profileName').textContent=playerName;
+  buildCustGrids();
+}
+function toggleCustomizer(){ const el=document.getElementById('avatarCustomizer'); el.style.display=el.style.display==='none'?'block':'none'; buildCustGrids(); }
+function buildCustGrids(){
+  buildSimpleGrid('custBodyGrid',AV_BODIES,avatar.bodyIdx,i=>{avatar.bodyIdx=i;applyProfile();saveGame();});
+  buildColorRow('custSkinRow',AV_SKINS,avatar.skinColor,c=>{avatar.skinColor=c;applyProfile();saveGame();});
+  buildSelectGrid('custHatGrid',AV_HATS,avatar.hatIdx,i=>{avatar.hatIdx=i;applyProfile();saveGame();});
+  buildSelectGrid('custAccGrid',AV_ACCS,avatar.accIdx,i=>{avatar.accIdx=i;applyProfile();saveGame();});
+}
+
+// ═══════════════════════════════════════
+//  REKENEN — willekeurige moeilijkheidsgraad per vraag
+// ═══════════════════════════════════════
+const OPS={add:{label:'Optelling',symbol:'+'},sub:{label:'Aftrekking',symbol:'−'},mul:{label:'Vermenigvuldiging',symbol:'×'},div:{label:'Deling',symbol:'÷'}};
+const QCHARS=['🦊','🐸','🐼','🦄','🐧','🦋','🐶','🐱','🐻','🐨'];
+
+// 4 niveaus — willekeurig gekozen per vraag, beloning schaalt mee
+const MATH_LEVELS=[
+  {id:1,name:'Makkelijk',stars:'⭐',     reward:5,  ranges:{add:[1,10], sub:[1,10],  mul:[1,5],  div:[1,5]}},
+  {id:2,name:'Normaal',  stars:'⭐⭐',   reward:10, ranges:{add:[1,20], sub:[1,20],  mul:[1,10], div:[1,10]}},
+  {id:3,name:'Moeilijk', stars:'⭐⭐⭐', reward:15, ranges:{add:[10,50],sub:[10,50], mul:[2,12], div:[2,12]}},
+  {id:4,name:'Expert',   stars:'⭐⭐⭐⭐',reward:25,ranges:{add:[20,100],sub:[20,100],mul:[6,15], div:[6,15]}},
+];
+let currentOp='add', currentMathLv=MATH_LEVELS[0], mathAns=0, mathDone=false, qci=0;
+
+function setOp(op,btn){ currentOp=op; document.querySelectorAll('.op-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); nextMath(); }
+function genQ(){
+  // kies een willekeurig niveau
+  currentMathLv = MATH_LEVELS[randInt(0,MATH_LEVELS.length-1)];
+  const [lo,hi]=currentMathLv.ranges[currentOp];
+  let a,b,ans;
+  if(currentOp==='add'){ a=randInt(lo,hi); b=randInt(lo,hi); ans=a+b; }
+  else if(currentOp==='sub'){ a=randInt(lo,hi); b=randInt(lo,a); ans=a-b; }
+  else if(currentOp==='mul'){ a=randInt(lo,hi); b=randInt(lo,hi); ans=a*b; }
+  else { b=randInt(Math.max(1,lo),hi); ans=randInt(Math.max(1,lo),hi); a=b*ans; }
+  return{a,b,ans};
+}
+function nextMath(){
+  mathDone=false; const{a,b,ans}=genQ(); mathAns=ans;
+  const lv=currentMathLv;
+  document.getElementById('opLabel').innerHTML=OPS[currentOp].label+`<span class="level-badge l${lv.id}">${lv.stars}</span>`;
+  document.getElementById('question').textContent=`${a} ${OPS[currentOp].symbol} ${b} = ?`;
+  const inp=document.getElementById('answerInput'); inp.value=''; inp.className='answer-input';
+  document.getElementById('qFeedback').className='feedback empty'; document.getElementById('qFeedback').textContent='';
+  document.getElementById('qStars').innerHTML=''; document.getElementById('qNextBtn').classList.remove('visible');
+  document.getElementById('goBtn').style.display='';
+  qci=(qci+1)%QCHARS.length; const ch=document.getElementById('qChar'); ch.textContent=QCHARS[qci]; ch.classList.remove('celebrate');
+}
+function numPress(d){ if(mathDone)return; const i=document.getElementById('answerInput'); if(i.value.length>=5)return; i.value+=d; }
+function numDel(){ if(mathDone)return; const i=document.getElementById('answerInput'); i.value=i.value.slice(0,-1); }
+function checkMath(){
+  if(mathDone)return; const inp=document.getElementById('answerInput'); const val=parseInt(inp.value); if(inp.value===''||isNaN(val))return;
+  mathDone=true; const ok=val===mathAns; const fb=document.getElementById('qFeedback');
+  const lv=currentMathLv;
+  if(ok){ addCorrect(lv.reward); inp.className='answer-input correct'; fb.textContent=pickMsg(); fb.className='feedback correct'; showStars('qStars'); doConfetti(); const ch=document.getElementById('qChar'); ch.classList.add('celebrate'); setTimeout(()=>ch.classList.remove('celebrate'),600); toast(`🪙 +${lv.reward} munten!`); changeMood(8); }
+  else { addWrong(); inp.className='answer-input wrong'; fb.textContent=`Bijna… het antwoord is ${mathAns} 💡`; fb.className='feedback wrong'; }
+  document.getElementById('goBtn').style.display='none'; document.getElementById('qNextBtn').classList.add('visible');
+}
+document.addEventListener('keydown',e=>{ if(!document.getElementById('panel-quiz').classList.contains('active'))return; if(mathDone)return; if(e.key>='0'&&e.key<='9')numPress(e.key); else if(e.key==='Backspace')numDel(); else if(e.key==='Enter')checkMath(); });
+
+// ═══════════════════════════════════════
+//  TAAL
+// ═══════════════════════════════════════
+const WORD_CATS=[
+  {id:'dieren',label:'🐘 Dieren',words:[
+    {w:'olifant',emoji:'🐘',hint:'Groot dier met een lange slurf'},{w:'schildpad',emoji:'🐢',hint:'Draagt een schild op zijn rug'},{w:'vlinder',emoji:'🦋',hint:'Vliegt met mooie gekleurde vleugels'},{w:'giraf',emoji:'🦒',hint:'Heeft de langste nek van alle dieren'},{w:'krokodil',emoji:'🐊',hint:'Gevaarlijk reptiel met scherpe tanden'},{w:'nijlpaard',emoji:'🦛',hint:'Groot dier dat graag in water zit'},{w:'papegaai',emoji:'🦜',hint:'Kleurrijke vogel die woorden kan nadoen'},{w:'eekhoorn',emoji:'🐿️',hint:'Bewaart nootjes voor de winter'},{w:'dolfijn',emoji:'🐬',hint:'Slim en speels zeezoogdier'},{w:'vleermuis',emoji:'🦇',hint:'Vliegt s nachts en slaapt overdag'},{w:'hagedis',emoji:'🦎',hint:'Klein reptiel dat in de zon ligt'},{w:'neushoorn',emoji:'🦏',hint:'Groot dier met een hoorn op zijn neus'},{w:'luipaard',emoji:'🐆',hint:'Grote gevlekte kat die snel rent'},{w:'cavia',emoji:'🐹',hint:'Klein knagertje als huisdier'},{w:'kangoeroe',emoji:'🦘',hint:'Springt ver en draagt jong in een buidel'},
+  ]},
+  {id:'eten',label:'🍎 Eten',words:[
+    {w:'boterham',emoji:'🥪',hint:'Brood met beleg voor de lunch'},{w:'chocolade',emoji:'🍫',hint:'Zoete lekkernij van cacao'},{w:'aardappel',emoji:'🥔',hint:'Groente die onder de grond groeit'},{w:'komkommer',emoji:'🥒',hint:'Groen en lang, hoort bij salade'},{w:'banaan',emoji:'🍌',hint:'Geel en krom tropisch fruit'},{w:'spaghetti',emoji:'🍝',hint:'Lang dun Italiaans pasta-gerecht'},{w:'watermeloen',emoji:'🍉',hint:'Groot groen fruit dat van binnen rood is'},{w:'pannenkoek',emoji:'🥞',hint:'Plat gebakken deeg met stroop'},{w:'aardbei',emoji:'🍓',hint:'Rood zomerfruit met groene blaadjes'},{w:'sinaasappel',emoji:'🍊',hint:'Oranje citrusfruit met vitamine C'},{w:'druiven',emoji:'🍇',hint:'Kleine ronde vruchten in een tros'},{w:'yoghurt',emoji:'🥛',hint:'Frisse zuiveldrank, lekker met fruit'},{w:'soep',emoji:'🍲',hint:'Warm vloeibaar gerecht'},{w:'ijsje',emoji:'🍦',hint:'Koud zoet dessert op een warme dag'},{w:'broodjes',emoji:'🥐',hint:'Klein rond brood'},
+  ]},
+  {id:'school',label:'📚 School',words:[
+    {w:'schrift',emoji:'📓',hint:'Boekje om in te schrijven'},{w:'potlood',emoji:'✏️',hint:'Schrijft en kan worden uitgewist'},{w:'bibliotheek',emoji:'📚',hint:'Gebouw vol boeken om te lenen'},{w:'vakantie',emoji:'🏖️',hint:'Vrije tijd wanneer school dicht is'},{w:'rekenen',emoji:'🔢',hint:'Sommen maken met getallen'},{w:'proefwerk',emoji:'📝',hint:'Toets op school'},{w:'rugzak',emoji:'🎒',hint:'Draag je boeken hierin naar school'},{w:'leerling',emoji:'🧒',hint:'Iemand die naar school gaat'},{w:'huiswerk',emoji:'🏠',hint:'Schoolopdrachten die je thuis maakt'},{w:'meester',emoji:'👨‍🏫',hint:'Mannelijke leraar in de klas'},{w:'pauze',emoji:'⏰',hint:'Rusttijd tussen de lessen'},{w:'klas',emoji:'🏫',hint:'Ruimte in school waar je les krijgt'},{w:'cijfer',emoji:'📊',hint:'Getal dat aangeeft hoe goed je iets deed'},{w:'gum',emoji:'🧹',hint:'Wist potloodsporen uit'},{w:'juf',emoji:'👩‍🏫',hint:'Vrouwelijke leraar'},
+  ]},
+  {id:'natuur',label:'🌿 Natuur',words:[
+    {w:'regenboog',emoji:'🌈',hint:'Kleurrijke boog na de regen'},{w:'onweer',emoji:'⛈️',hint:'Storm met bliksem en donder'},{w:'waterval',emoji:'💧',hint:'Water dat van een hoogte valt'},{w:'zonneblom',emoji:'🌻',hint:'Grote gele bloem die naar de zon draait'},{w:'sneeuwvlok',emoji:'❄️',hint:'IJskristal dat valt in de winter'},{w:'paddenstoel',emoji:'🍄',hint:'Groeit in het bos'},{w:'sterren',emoji:'🌌',hint:'Lichtpuntjes aan de nachtelijke hemel'},{w:'vulkaan',emoji:'🌋',hint:'Berg die vuur en lava spuwt'},{w:'woestijn',emoji:'🏜️',hint:'Droog en heet landschap vol zand'},{w:'oceaan',emoji:'🌊',hint:'Enorme hoeveelheid zout water'},{w:'lente',emoji:'🌸',hint:'Het seizoen na de winter'},{w:'tornado',emoji:'🌪️',hint:'Gevaarlijke ronddraaiende wind'},{w:'bliksem',emoji:'⚡',hint:'Elektrische ontlading bij onweer'},{w:'gletsjer',emoji:'🏔️',hint:'Bevroren rivier van ijs in de bergen'},{w:'koraal',emoji:'🪸',hint:'Kleurrijke structuur in warme zeeën'},
+  ]},
+  {id:'sport',label:'⚽ Sport',words:[
+    {w:'voetbal',emoji:'⚽',hint:'De populairste sport ter wereld'},{w:'zwemmen',emoji:'🏊',hint:'Bewegen in het water'},{w:'basketbal',emoji:'🏀',hint:'Gooi de bal in de mand'},{w:'turnen',emoji:'🤸',hint:'Acrobatische sport'},{w:'wielrennen',emoji:'🚴',hint:'Sportief fietsen'},{w:'schaatsen',emoji:'⛸️',hint:'Glijden over ijs'},{w:'hardlopen',emoji:'🏃',hint:'Snel te voet bewegen'},{w:'boksen',emoji:'🥊',hint:'Gevechtsport met handschoenen'},{w:'trampolinespringen',emoji:'🤸',hint:'Hoog opveren op een trampoline'},{w:'hockeystick',emoji:'🏑',hint:'Stok voor hockey'},{w:'judo',emoji:'🥋',hint:'Japanse vechtkunst'},{w:'fietsen',emoji:'🚲',hint:'Rijden op twee wielen'},{w:'klimmen',emoji:'🧗',hint:'Omhoog gaan op een rots'},{w:'roeien',emoji:'🚣',hint:'Een boot voortbewegen met riemen'},{w:'rugbybal',emoji:'🏉',hint:'Ovale bal voor rugby'},
+  ]},
+  {id:'verkeer',label:'🚦 Verkeer',words:[
+    {w:'stoplicht',emoji:'🚦',hint:'Rood, oranje en groen licht op straat'},{w:'zebrapad',emoji:'🦓',hint:'Witte strepen op de weg om over te steken'},{w:'fietspad',emoji:'🚲',hint:'Speciale weg alleen voor fietsers'},{w:'rotonde',emoji:'🔄',hint:'Ronde weg waar autos omheen rijden'},{w:'snelweg',emoji:'🛣️',hint:'Heel brede weg waar je snel mag rijden'},{w:'verkeersbord',emoji:'🚸',hint:'Bord langs de weg met een teken of regel'},{w:'voetganger',emoji:'🚶',hint:'Iemand die te voet loopt op straat'},{w:'ambulance',emoji:'🚑',hint:'Ziekenauto met sirene voor spoed'},{w:'brandweer',emoji:'🚒',hint:'Rode wagen die branden blust'},{w:'politieauto',emoji:'🚓',hint:'Auto van de politie met blauw zwaailicht'},{w:'vrachtwagen',emoji:'🚚',hint:'Grote auto die goederen vervoert'},{w:'helikopter',emoji:'🚁',hint:'Vliegtuig dat omhoog stijgt met rotorbladen'},{w:'bromfiets',emoji:'🛵',hint:'Klein gemotoriseerd tweewielig voertuig'},{w:'trein',emoji:'🚂',hint:'Rijdt op rails en vervoert veel mensen'},{w:'viaduct',emoji:'🌉',hint:'Brug waarover een weg loopt'},
+  ]},
+  {id:'ruimte',label:'🚀 Ruimte',words:[
+    {w:'planeet',emoji:'🪐',hint:'Grote bol die rond een ster draait'},{w:'raket',emoji:'🚀',hint:'Voertuig om de ruimte in te reizen'},{w:'sterrenstelsel',emoji:'🌌',hint:'Enorme groep van miljarden sterren'},{w:'maanlanding',emoji:'🌕',hint:'Toen mensen voor het eerst op de maan stapten'},{w:'astronaut',emoji:'👨‍🚀',hint:'Persoon die de ruimte in reist'},{w:'zwartegat',emoji:'🕳️',hint:'Plek waar zelfs licht niet ontsnapt'},{w:'meteoor',emoji:'☄️',hint:'Steen die door de ruimte vliegt en brandt'},{w:'telescoop',emoji:'🔭',hint:'Kijker om ver weg sterren te zien'},{w:'ruimtestation',emoji:'🛸',hint:'Station dat rond de aarde cirkelt'},{w:'zwaartekracht',emoji:'🌍',hint:'Kracht die je naar de grond trekt'},{w:'zonnestelsel',emoji:'☀️',hint:'De zon met alle planeten eromheen'},{w:'komeet',emoji:'☄️',hint:'Ijzige bol met een lichtgevende staart'},{w:'melkweg',emoji:'🌌',hint:'Het sterrenstelsel waar wij in wonen'},{w:'satelliet',emoji:'📡',hint:'Apparaat dat rond de aarde cirkelt'},{w:'buitenaardse',emoji:'👽',hint:'Wezen van een andere planeet'},
+  ]},
+  {id:'lichaam',label:'🧠 Lichaam',words:[
+    {w:'hersenen',emoji:'🧠',hint:'Orgaan in je hoofd waarmee je denkt'},{w:'hartslag',emoji:'❤️',hint:'Het kloppen van je hart'},{w:'knieschijf',emoji:'🦵',hint:'Bot aan de voorkant van je knie'},{w:'longen',emoji:'🫁',hint:'Organen waarmee je ademt'},{w:'elleboog',emoji:'💪',hint:'Gewricht in het midden van je arm'},{w:'schouder',emoji:'🤷',hint:'Gewricht tussen arm en romp'},{w:'maag',emoji:'🫃',hint:'Orgaan dat eten verteert'},{w:'tandarts',emoji:'🦷',hint:'Dokter die voor je tanden zorgt'},{w:'wenkbrauw',emoji:'🤨',hint:'Haarrij boven je oog'},{w:'enkel',emoji:'🦶',hint:'Gewricht tussen been en voet'},{w:'bloedvat',emoji:'🩸',hint:'Buisje waardoor bloed stroomt'},{w:'ruggengraat',emoji:'🦴',hint:'Rij botten in het midden van je rug'},{w:'nagel',emoji:'💅',hint:'Hard laagje aan het einde van je vinger'},{w:'trommelvlies',emoji:'👂',hint:'Dun vliesje in je oor dat geluid opvangt'},{w:'spierpijn',emoji:'😣',hint:'Pijn in je spieren na veel bewegen'},
+  ]},
+];
+
+// 4 taal niveaus — willekeurig per woord, beloning schaalt mee
+const TAAL_LEVELS=[
+  {id:1,name:'Makkelijk',stars:'⭐',     reward:5,  blanks:'min',  showHint:true,  showLen:true},
+  {id:2,name:'Normaal',  stars:'⭐⭐',   reward:10, blanks:'mid',  showHint:true,  showLen:true},
+  {id:3,name:'Moeilijk', stars:'⭐⭐⭐', reward:15, blanks:'lots', showHint:true,  showLen:false},
+  {id:4,name:'Expert',   stars:'⭐⭐⭐⭐',reward:25,blanks:'most', showHint:false, showLen:false},
+];
+let currentTaalLv=TAAL_LEVELS[0], tAllWords=[], tList=[], tIdx=0;
+let tWord='', tBlanks=[], tGuessed={}, tSelBlank=null, tDone=false;
+
+function initTaal(){
+  buildTaalModes();
+  // pool ALL words from ALL categories into one big list
+  tAllWords=[];
+  WORD_CATS.forEach(cat => cat.words.forEach(w => tAllWords.push(w)));
+  startTaalFill();
+  startSpellList();
+  startVerbList();
+  startCapList();
+  switchTaalMode();
+}
+function startTaalFill(){ tList=[...tAllWords].sort(()=>Math.random()-.5); tIdx=0; showWord(); }
+function pickBlanks(word){
+  const lv=currentTaalLv;
+  const len=word.length;
+  let count;
+  if(lv.blanks==='min')       count = len<=5?1:2;
+  else if(lv.blanks==='mid')  count = len<=4?1:len<=6?2:3;
+  else if(lv.blanks==='lots') count = len<=4?2:len<=7?3:Math.ceil(len/2);
+  else                        count = Math.max(2,Math.ceil(len*0.65));
+  const pool=[]; for(let i=0;i<len;i++) if(word[i]!=='-'&&word[i]!==' ') pool.push(i);
+  count=Math.min(count,pool.length);
+  const chosen=[]; while(chosen.length<count){ const r=pool[randInt(0,pool.length-1)]; if(!chosen.includes(r)) chosen.push(r); }
+  return chosen.sort((a,b)=>a-b);
+}
+
+function showWord(){
+  tDone=false; tSelBlank=null;
+  // kies een willekeurig niveau voor dit woord
+  currentTaalLv = TAAL_LEVELS[randInt(0,TAAL_LEVELS.length-1)];
+  const lv=currentTaalLv;
+  const entry=tList[tIdx%tList.length]; tWord=entry.w; tBlanks=pickBlanks(tWord); tGuessed={};
+  tBlanks.forEach(i=>tGuessed[i]=null);
+  document.getElementById('wordEmoji').textContent=entry.emoji;
+  document.getElementById('wordHint').innerHTML=(lv.showHint?'💡 '+entry.hint:'🤔 Welk woord hoort bij dit plaatje?')+`<span class="level-badge l${lv.id}">${lv.stars}</span>`;
+  document.getElementById('hintBar').textContent=(lv.showLen?`${tWord.length} letters • `:'')+'Tik een vakje, dan een letter';
+  document.getElementById('tFeedback').className='feedback empty'; document.getElementById('tFeedback').textContent='';
+  document.getElementById('tStars').innerHTML='';
+  document.getElementById('taalCheckBtn').style.display=''; document.getElementById('taalCheckBtn').disabled=true;
+  document.getElementById('taalNextBtn').style.display='none';
+  renderWordDisplay(); renderAlpha();
+}
+function renderWordDisplay(){
+  const el=document.getElementById('wordDisplay'); el.innerHTML='';
+  for(let i=0;i<tWord.length;i++){
+    const ch=tWord[i]; const div=document.createElement('div');
+    if(ch==='-'||ch===' '){ div.className='letter-box dash'; div.textContent='–'; }
+    else if(!tBlanks.includes(i)){ div.className='letter-box known'; div.textContent=ch.toUpperCase(); }
+    else {
+      const g=tGuessed[i]; const isSel=tSelBlank===i;
+      if(g===null){ div.className='letter-box blank-empty'+(isSel?' blank-selected':''); div.textContent=isSel?'?':'_'; }
+      else if(tDone){ div.className=g===ch?'letter-box blank-correct':'letter-box blank-wrong'; div.textContent=g.toUpperCase(); }
+      else { div.className='letter-box blank-empty'+(isSel?' blank-selected':''); div.textContent=g.toUpperCase(); }
+      div.onclick=()=>{ if(tDone)return; tSelBlank=i; renderWordDisplay(); renderAlpha(); };
+    }
+    el.appendChild(div);
+  }
+  document.getElementById('taalCheckBtn').disabled=!tBlanks.every(i=>tGuessed[i]!==null)||tDone;
+}
+function renderAlpha(){
+  const el=document.getElementById('alphaRows'); el.innerHTML='';
+  const ROWS=[['a','b','c','d','e','f','g','h','i','j'],['k','l','m','n','o','p','q','r','s'],['t','u','v','w','x','y','z']];
+  ROWS.forEach(row=>{
+    const rowEl=document.createElement('div'); rowEl.className='alpha-row';
+    row.forEach(letter=>{
+      const btn=document.createElement('button'); btn.className='alpha-btn'; btn.textContent=letter.toUpperCase();
+      if(tDone){ btn.disabled=true; rowEl.appendChild(btn); return; }
+      if(tSelBlank!==null&&tGuessed[tSelBlank]===letter) btn.classList.add('used-c');
+      btn.onclick=()=>{
+        if(tDone||tSelBlank===null) return;
+        tGuessed[tSelBlank]=letter;
+        const next=tBlanks.find(i=>i>tSelBlank&&tGuessed[i]===null)??tBlanks.find(i=>tGuessed[i]===null)??null;
+        tSelBlank=next; renderWordDisplay(); renderAlpha();
+      };
+      rowEl.appendChild(btn);
+    });
+    if(row[0]==='t'){
+      const del=document.createElement('button'); del.className='alpha-btn'; del.textContent='⌫';
+      del.style.cssText='background:#FFE8E8;color:var(--red);box-shadow:0 3px 0 #FFCCCC;';
+      del.onclick=()=>{ if(tDone||tSelBlank===null)return; tGuessed[tSelBlank]=null; renderWordDisplay(); renderAlpha(); };
+      rowEl.appendChild(del);
+    }
+    el.appendChild(rowEl);
+  });
+}
+function checkWord(){
+  if(tDone)return; if(!tBlanks.every(i=>tGuessed[i]!==null)){toast('Vul alle vakjes in!');return;}
+  tDone=true; tSelBlank=null;
+  const lv=currentTaalLv;
+  const ok=tBlanks.every(i=>tGuessed[i]===tWord[i]); const fb=document.getElementById('tFeedback');
+  if(ok){ addCorrect(lv.reward); fb.textContent=pickMsg(); fb.className='feedback correct'; showStars('tStars'); doConfetti(); toast(`🪙 +${lv.reward} munten!`); changeMood(5); }
+  else { addWrong(); fb.textContent=`Het woord is: ${tWord.toUpperCase()} 💡`; fb.className='feedback wrong'; }
+  renderWordDisplay(); renderAlpha();
+  document.getElementById('taalCheckBtn').style.display='none';
+  document.getElementById('taalNextBtn').style.display='';
+  document.getElementById('hintBar').textContent='';
+}
+function nextWord(){ tIdx++; if(tIdx>=tList.length){ tList=[...tAllWords].sort(()=>Math.random()-.5); tIdx=0; } showWord(); }
+
+// ═══════════════════════════════════════
+//  TAAL MODES (oefentypes voor 2de leerjaar)
+// ═══════════════════════════════════════
+const TAAL_MODES=[
+  {id:'fill',  label:'🔤 Letters'},
+  {id:'spell', label:'✏️ Spelling'},
+  {id:'verb',  label:'✍️ d / t / dt'},
+  {id:'cap',   label:'🔠 Hoofdletter'},
+];
+let taalMode='fill';
+
+function buildTaalModes(){
+  const el=document.getElementById('taalModes'); if(!el)return; el.innerHTML='';
+  TAAL_MODES.forEach(m=>{
+    const btn=document.createElement('button');
+    btn.className='tmode-btn'+(m.id===taalMode?' active':'');
+    btn.textContent=m.label;
+    btn.onclick=()=>{ taalMode=m.id; buildTaalModes(); switchTaalMode(); saveGame(); };
+    el.appendChild(btn);
+  });
+}
+
+function switchTaalMode(){
+  // hide all cards
+  ['Fill','Spell','Verb','Cap'].forEach(s=>{ const el=document.getElementById('taalCard'+s); if(el) el.style.display='none'; });
+  if(taalMode==='fill'){
+    document.getElementById('taalCardFill').style.display='';
+    showWord();
+  } else if(taalMode==='spell'){
+    document.getElementById('taalCardSpell').style.display='';
+    nextSpell();
+  } else if(taalMode==='verb'){
+    document.getElementById('taalCardVerb').style.display='';
+    nextVerb();
+  } else if(taalMode==='cap'){
+    document.getElementById('taalCardCap').style.display='';
+    nextCap();
+  }
+}
+
+// ─────────────────────────────────────────
+//  SPELLING — kies juiste schrijfwijze
+//  Veelgemaakte fouten in 2de leerjaar
+// ─────────────────────────────────────────
+const SPELL_ITEMS=[
+  // Open/gesloten lettergrepen (één-tweeklank)
+  {cat:'Open/gesloten lettergreep', correct:'bomen',  options:['bomen','bommen']},
+  {cat:'Open/gesloten lettergreep', correct:'manen',  options:['manen','mannen']},
+  {cat:'Open/gesloten lettergreep', correct:'lopen',  options:['lopen','loppen']},
+  {cat:'Open/gesloten lettergreep', correct:'kopen',  options:['kopen','koppen']},
+  {cat:'Open/gesloten lettergreep', correct:'beker',  options:['beker','bekker']},
+  {cat:'Open/gesloten lettergreep', correct:'roken',  options:['roken','rokken']},
+  {cat:'Open/gesloten lettergreep', correct:'tasje',  options:['tasje','taasje']},
+  {cat:'Open/gesloten lettergreep', correct:'busje',  options:['busje','buusje']},
+  {cat:'Open/gesloten lettergreep', correct:'koken',  options:['koken','kokken']},
+  {cat:'Open/gesloten lettergreep', correct:'wagen',  options:['wagen','waggen']},
+  // ei / ij
+  {cat:'ei of ij',                  correct:'fiets',  options:['fiets','feits']},
+  {cat:'ei of ij',                  correct:'lijn',   options:['lijn','lein']},
+  {cat:'ei of ij',                  correct:'klein',  options:['klein','klijn']},
+  {cat:'ei of ij',                  correct:'rijst',  options:['rijst','reist']},
+  {cat:'ei of ij',                  correct:'trein',  options:['trein','trijn']},
+  {cat:'ei of ij',                  correct:'wijn',   options:['wijn','wein']},
+  // au / ou
+  {cat:'au of ou',                  correct:'koud',   options:['koud','kaud']},
+  {cat:'au of ou',                  correct:'auto',   options:['auto','outo']},
+  {cat:'au of ou',                  correct:'goud',   options:['goud','gaud']},
+  {cat:'au of ou',                  correct:'blauw',  options:['blauw','blouw']},
+  // f / v aan einde
+  {cat:'f of v',                    correct:'lief',   options:['lief','liev']},
+  {cat:'f of v',                    correct:'duif',   options:['duif','duiv']},
+  {cat:'f of v',                    correct:'brief',  options:['brief','briev']},
+  {cat:'f of v',                    correct:'half',   options:['half','halv']},
+  // s / z aan einde
+  {cat:'s of z',                    correct:'huis',   options:['huis','huiz']},
+  {cat:'s of z',                    correct:'glas',   options:['glas','glaz']},
+  {cat:'s of z',                    correct:'reus',   options:['reus','reuz']},
+  // ch / g
+  {cat:'ch of g',                   correct:'lachen', options:['lachen','laggen']},
+  {cat:'ch of g',                   correct:'nacht',  options:['nacht','nagt']},
+  {cat:'ch of g',                   correct:'licht',  options:['licht','ligt']},
+  // d aan einde (verklankt als t)
+  {cat:'d of t aan einde',          correct:'hond',   options:['hond','hont']},
+  {cat:'d of t aan einde',          correct:'paard',  options:['paard','paart']},
+  {cat:'d of t aan einde',          correct:'wind',   options:['wind','wint']},
+  {cat:'d of t aan einde',          correct:'land',   options:['land','lant']},
+  {cat:'d of t aan einde',          correct:'broed',  options:['broed','broet']},
+];
+
+let spellIdx=0, spellList=[], spellDone=false, currentSpellLv=TAAL_LEVELS[0];
+
+function startSpellList(){
+  spellList=[...SPELL_ITEMS].sort(()=>Math.random()-.5);
+  spellIdx=0;
+}
+function nextSpell(){
+  if(!spellList.length) startSpellList();
+  // advance index if we just finished a question
+  if(spellDone){ spellIdx++; }
+  if(spellIdx>=spellList.length){ startSpellList(); }
+  spellDone=false;
+  currentSpellLv = TAAL_LEVELS[randInt(0,TAAL_LEVELS.length-1)];
+  const item=spellList[spellIdx%spellList.length];
+  const lv=currentSpellLv;
+  document.getElementById('spellCatBadge').innerHTML='📝 '+item.cat+`<span class="level-badge l${lv.id}" style="margin-left:6px">${lv.stars}</span>`;
+  document.getElementById('spellQuestion').textContent='Welk woord is goed gespeld?';
+  const opts=document.getElementById('spellOptions');
+  // shuffle options
+  const shuffled=[...item.options].sort(()=>Math.random()-.5);
+  opts.className='spell-options'+(shuffled.length===3?' three':'');
+  opts.innerHTML='';
+  shuffled.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='spell-opt'; b.textContent=opt;
+    b.onclick=()=>answerSpell(opt,item.correct,b);
+    opts.appendChild(b);
+  });
+  document.getElementById('sFeedback').className='feedback empty';
+  document.getElementById('sFeedback').textContent='';
+  document.getElementById('spellNextBtn').style.display='none';
+}
+function answerSpell(chosen,correct,btn){
+  if(spellDone)return;
+  spellDone=true;
+  const fb=document.getElementById('sFeedback');
+  const lv=currentSpellLv;
+  document.querySelectorAll('#spellOptions .spell-opt').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===correct) b.classList.add('correct');
+    else if(b===btn) b.classList.add('wrong');
+  });
+  if(chosen===correct){
+    addCorrect(lv.reward); fb.textContent=pickMsg(); fb.className='feedback correct';
+    doConfetti(); toast(`🪙 +${lv.reward} munten!`); changeMood(5);
+  } else {
+    addWrong(); fb.textContent=`Het juiste woord is: ${correct} 💡`; fb.className='feedback wrong';
+  }
+  document.getElementById('spellNextBtn').style.display='';
+}
+
+// ─────────────────────────────────────────
+//  WERKWOORDEN — d, t of dt
+// ─────────────────────────────────────────
+const VERB_ITEMS=[
+  // Eenvoudig: ik-vorm = stam (geen t/d toevoegen)
+  {sent:'Ik wandel in het park.',  before:'Ik wand', after:' in het park.', answer:'el', skip:true},
+  // We zullen voornamelijk d/t/dt cases tonen
+  // Tegenwoordige tijd: stam + t (hij/zij/het, jij na werkwoord)
+  {sent:'Hij wandelt in het park.', before:'Hij wandel', after:' in het park.', answer:'t', rule:"Tegenwoordige tijd, derde persoon: stam + t"},
+  {sent:'Zij fietst naar school.',  before:'Zij fiets',  after:' naar school.', answer:'t', rule:"Tegenwoordige tijd, derde persoon: stam + t"},
+  {sent:'De hond blaft hard.',      before:'De hond blaf', after:' hard.', answer:'t', rule:"Tegenwoordige tijd, derde persoon: stam + t"},
+  {sent:'Het kind speelt buiten.',  before:'Het kind speel', after:' buiten.', answer:'t', rule:"Tegenwoordige tijd, derde persoon: stam + t"},
+  {sent:'Jij werkt elke dag.',      before:'Jij werk',  after:' elke dag.', answer:'t', rule:"Bij 'jij/je' na het werkwoord: stam + t"},
+  // Stam eindigt op -d: nog steeds + t = dt
+  {sent:'Hij wordt groot.',         before:'Hij wor',   after:' groot.', answer:'dt', rule:"Stam (word-) eindigt op -d, dus word + t = wordt"},
+  {sent:'Zij vindt het leuk.',      before:'Zij vin',   after:' het leuk.', answer:'dt', rule:"Stam (vind-) eindigt op -d, dus vind + t = vindt"},
+  {sent:'Hij rijdt naar huis.',     before:'Hij rij',   after:' naar huis.', answer:'dt', rule:"Stam (rijd-) eindigt op -d, dus rijd + t = rijdt"},
+  {sent:'De jongen biedt hulp.',    before:'De jongen bie', after:' hulp.', answer:'dt', rule:"Stam (bied-) eindigt op -d, dus bied + t = biedt"},
+  // Verleden tijd: stam + de of te (zwakke werkwoorden)
+  {sent:'Hij wandelde gisteren.',   before:'Hij wandel', after:' gisteren.', answer:'de', rule:"Verleden tijd 'wandelen': stam eindigt niet op een 't kofschip'-letter, dus + de"},
+  {sent:'Zij fietste naar school.', before:'Zij fiets',  after:' naar school.', answer:'te', rule:"Verleden tijd 'fietsen': stam eindigt op een 't kofschip'-letter (s), dus + te"},
+  {sent:'De hond blafte hard.',     before:'De hond blaf', after:' hard.', answer:'te', rule:"Verleden tijd 'blaffen': stam eindigt op een 't kofschip'-letter (f), dus + te"},
+  {sent:'Het kind speelde buiten.', before:'Het kind speel', after:' buiten.', answer:'de', rule:"Verleden tijd 'spelen': stam eindigt niet op een 't kofschip'-letter, dus + de"},
+  {sent:'Hij werkte hard.',         before:'Hij werk',  after:' hard.', answer:'te', rule:"Verleden tijd 'werken': stam eindigt op een 't kofschip'-letter (k), dus + te"},
+  // Stam eindigt op -t: alleen één t in tt geval (he werkt vs hij beet)
+  {sent:'Hij praat veel.',          before:'Hij praa',  after:' veel.', answer:'t', rule:"Stam (praat-) eindigt al op -t, geen extra t"},
+  {sent:'Zij eet appels.',          before:'Zij ee',    after:' appels.', answer:'t', rule:"Stam (eet-) eindigt al op -t, geen extra t"},
+];
+
+// Voor 2de leerjaar laten we voornamelijk eenvoudige d/t/dt zien — filter op enkel d/t/dt antwoorden voor de standaard knop
+const VERB_SIMPLE = VERB_ITEMS.filter(v => v.answer==='d'||v.answer==='t'||v.answer==='dt');
+
+let verbIdx=0, verbList=[], verbDone=false;
+function startVerbList(){
+  verbList=[...VERB_SIMPLE].sort(()=>Math.random()-.5);
+  verbIdx=0;
+}
+let currentVerbLv=TAAL_LEVELS[0];
+function nextVerb(){
+  if(!verbList.length) startVerbList();
+  // advance index if we just finished a question
+  if(verbDone){ verbIdx++; }
+  if(verbIdx>=verbList.length){ startVerbList(); }
+  verbDone=false;
+  currentVerbLv = TAAL_LEVELS[randInt(0,TAAL_LEVELS.length-1)];
+  const lv=currentVerbLv;
+  const item=verbList[verbIdx%verbList.length];
+  // update badge in card
+  const badge=document.querySelector('#taalCardVerb .spell-cat-badge');
+  if(badge) badge.innerHTML='✍️ Werkwoorden: d, t of dt?'+`<span class="level-badge l${lv.id}" style="margin-left:6px">${lv.stars}</span>`;
+  document.getElementById('verbSentence').innerHTML=
+    item.before+'<span class="verb-blank" id="verbBlank">__</span>'+item.after;
+  document.querySelectorAll('.verb-opt').forEach(b=>{ b.className='verb-opt'; b.disabled=false; });
+  document.getElementById('vFeedback').className='feedback empty';
+  document.getElementById('vFeedback').textContent='';
+  document.getElementById('verbRule').className='verb-rule';
+  document.getElementById('verbRule').textContent='';
+  document.getElementById('verbNextBtn').style.display='none';
+}
+function answerVerb(chosen,btn){
+  if(verbDone)return;
+  verbDone=true;
+  const item=verbList[verbIdx%verbList.length];
+  const correct=item.answer;
+  const lv=currentVerbLv;
+  document.querySelectorAll('.verb-opt').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.end===correct) b.classList.add('correct');
+    else if(b===btn) b.classList.add('wrong');
+  });
+  const blank=document.getElementById('verbBlank');
+  if(blank){
+    blank.textContent=correct;
+    blank.classList.add('filled');
+    blank.classList.add(chosen===correct?'correct':'wrong');
+  }
+  const fb=document.getElementById('vFeedback');
+  if(chosen===correct){
+    addCorrect(lv.reward); fb.textContent=pickMsg(); fb.className='feedback correct';
+    doConfetti(); toast(`🪙 +${lv.reward} munten!`); changeMood(5);
+  } else {
+    addWrong(); fb.textContent=`Het juiste antwoord is: ${correct.toUpperCase()} 💡`; fb.className='feedback wrong';
+  }
+  // show the rule explanation
+  const rule=document.getElementById('verbRule');
+  if(item.rule){ rule.textContent='💡 '+item.rule; rule.classList.add('show'); }
+  document.getElementById('verbNextBtn').style.display='';
+}
+
+// ─────────────────────────────────────────
+//  HOOFDLETTERS — tik op woorden die met hoofdletter horen
+// ─────────────────────────────────────────
+const CAP_SENTENCES=[
+  // [sentence with all lowercase, indices of words that need capital (besides first)]
+  {text:'ik woon in brussel.', caps:[0,3]},
+  {text:'mijn naam is sara.', caps:[0,3]},
+  {text:'we gaan naar parijs op vakantie.', caps:[0,3]},
+  {text:'de jongen heet tom.', caps:[0,3]},
+  {text:'op zaterdag spelen we voetbal.', caps:[0]},
+  {text:'in januari is het koud.', caps:[0,1]},
+  {text:'mijn juf heet meester jan.', caps:[0,4]},
+  {text:'de hond luna rent snel.', caps:[0,2]},
+  {text:'ik hou van nederlands.', caps:[0,3]},
+  {text:'we gingen naar antwerpen.', caps:[0,3]},
+  {text:'op maandag heb ik gym.', caps:[0,1]},
+  {text:'mijn broer max is jarig.', caps:[0,2]},
+  {text:'in de zomer ga ik naar spanje.', caps:[0,6]},
+  {text:'het meisje emma lacht.', caps:[0,2]},
+  {text:'mijn opa woont in gent.', caps:[0,4]},
+  {text:'we gaan naar de zoo.', caps:[0]},
+  {text:'mijn poes mimi slaapt.', caps:[0,2]},
+  {text:'jens en lien zijn vrienden.', caps:[0,2]},
+];
+
+let capIdx=0, capList=[], capDone=false, capSelected=new Set();
+
+function startCapList(){
+  capList=[...CAP_SENTENCES].sort(()=>Math.random()-.5);
+  capIdx=0;
+}
+let currentCapLv=TAAL_LEVELS[0];
+function nextCap(){
+  if(!capList.length) startCapList();
+  if(capDone) capIdx++;
+  if(capIdx>=capList.length) startCapList();
+  capDone=false; capSelected.clear();
+  currentCapLv = TAAL_LEVELS[randInt(0,TAAL_LEVELS.length-1)];
+  const item=capList[capIdx%capList.length];
+  const lv=currentCapLv;
+  document.querySelector('#taalCardCap .spell-cat-badge').innerHTML='🔠 Hoofdletter of niet?'+`<span class="level-badge l${lv.id}" style="margin-left:6px">${lv.stars}</span>`;
+  const words=item.text.split(' ');
+  const el=document.getElementById('capSentence'); el.innerHTML='';
+  words.forEach((w,i)=>{
+    const span=document.createElement('span');
+    span.className='cap-word'; span.textContent=w;
+    span.dataset.idx=i;
+    span.onclick=()=>{
+      if(capDone)return;
+      if(capSelected.has(i)){ capSelected.delete(i); span.classList.remove('selected'); }
+      else { capSelected.add(i); span.classList.add('selected'); }
+    };
+    el.appendChild(span);
+    if(i<words.length-1) el.appendChild(document.createTextNode(' '));
+  });
+  document.getElementById('cFeedback').className='feedback empty';
+  document.getElementById('cFeedback').textContent='';
+  document.getElementById('capCheckBtn').style.display='';
+  document.getElementById('capCheckBtn').disabled=false;
+  document.getElementById('capNextBtn').style.display='none';
+  document.getElementById('capHint').textContent='Tik op de woorden die met een hoofdletter moeten beginnen';
+}
+function checkCap(){
+  if(capDone)return;
+  capDone=true;
+  const item=capList[capIdx%capList.length];
+  const correctSet=new Set(item.caps);
+  const words=document.querySelectorAll('#capSentence .cap-word');
+  const lv=currentCapLv;
+  let allOk=true;
+  words.forEach((span,i)=>{
+    const shouldCap=correctSet.has(i);
+    const selected=capSelected.has(i);
+    span.classList.remove('selected');
+    if(shouldCap && selected){
+      span.classList.add('correct');
+      span.textContent=span.textContent.charAt(0).toUpperCase()+span.textContent.slice(1);
+    } else if(shouldCap && !selected){
+      span.classList.add('missed');
+      span.textContent=span.textContent.charAt(0).toUpperCase()+span.textContent.slice(1);
+      allOk=false;
+    } else if(!shouldCap && selected){
+      span.classList.add('wrong');
+      allOk=false;
+    }
+  });
+  const fb=document.getElementById('cFeedback');
+  if(allOk){
+    addCorrect(lv.reward); fb.textContent=pickMsg(); fb.className='feedback correct';
+    doConfetti(); toast(`🪙 +${lv.reward} munten!`); changeMood(5);
+  } else {
+    addWrong();
+    fb.innerHTML=`Goed gedaan, maar let op de gele woorden! 💡<br><span style="font-size:.85rem;font-weight:700;color:#888">Hoofdletter na een punt, voor namen, plaatsen, dagen, maanden, talen, landen</span>`;
+    fb.className='feedback wrong';
+  }
+  document.getElementById('capCheckBtn').style.display='none';
+  document.getElementById('capNextBtn').style.display='';
+  document.getElementById('capHint').textContent='';
+}
+
+// ═══════════════════════════════════════
+//  PETS & SHOP
+// ═══════════════════════════════════════
+const PETS=[
+  {id:'dog',  emoji:'🐶',name:'Hond',    price:40, tags:['dog','common']},
+  {id:'cat',  emoji:'🐱',name:'Kat',     price:40, tags:['cat','common']},
+  {id:'fox',  emoji:'🦊',name:'Vos',     price:60, tags:['fox','common']},
+  {id:'bunny',emoji:'🐰',name:'Konijn',  price:60, tags:['bunny','common']},
+  {id:'bear', emoji:'🐻',name:'Beer',    price:80, tags:['bear','common']},
+  {id:'panda',emoji:'🐼',name:'Panda',   price:100,tags:['panda','common']},
+  {id:'dino', emoji:'🦕',name:'Dino',    price:130,tags:['dino','common']},
+  {id:'uni',  emoji:'🦄',name:'Eenhoorn',price:180,tags:['uni','common']},
+];
+const ACCS=[
+  {id:'hat_party',   slot:'hat', emoji:'🎉',name:'Feesthoedje',price:20,tags:['common']},
+  {id:'hat_top',     slot:'hat', emoji:'🎩',name:'Hoge Hoed',  price:30,tags:['common']},
+  {id:'hat_cowboy',  slot:'hat', emoji:'🤠',name:'Cowboyhoed', price:30,tags:['common']},
+  {id:'hat_crown',   slot:'hat', emoji:'👑',name:'Kroon',      price:50,tags:['common']},
+  {id:'hat_flower',  slot:'hat', emoji:'🌸',name:'Bloem',      price:25,tags:['common']},
+  {id:'neck_bow',    slot:'neck',emoji:'🎀',name:'Strikje',    price:20,tags:['common']},
+  {id:'neck_tie',    slot:'neck',emoji:'👔',name:'Stropdas',   price:25,tags:['common']},
+  {id:'neck_gem',    slot:'neck',emoji:'💎',name:'Diamant',    price:55,tags:['common']},
+  {id:'neck_heart',  slot:'neck',emoji:'❤️',name:'Hartje',     price:20,tags:['common']},
+  {id:'side_star',   slot:'side',emoji:'⭐',name:'Ster',       price:15,tags:['common']},
+  {id:'side_music',  slot:'side',emoji:'🎵',name:'Muzieknoot', price:20,tags:['common']},
+  {id:'side_balloon',slot:'side',emoji:'🎈',name:'Ballon',     price:15,tags:['common']},
+  {id:'bg_rainbow',  slot:'bg',  emoji:'🌈',name:'Regenboog',  price:30,tags:['common']},
+  {id:'bg_fire',     slot:'bg',  emoji:'🔥',name:'Vuur',       price:30,tags:['common']},
+  {id:'bg_bolt',     slot:'bg',  emoji:'⚡',name:'Bliksem',    price:35,tags:['common']},
+  {id:'bg_snow',     slot:'bg',  emoji:'❄️',name:'Sneeuwvlok', price:25,tags:['common']},
+  {id:'dog_ball',    slot:'side',emoji:'🎾',name:'Tennisbal',  price:15,tags:['dog']},
+  {id:'dog_bone',    slot:'side',emoji:'🦴',name:'Bot',        price:15,tags:['dog']},
+  {id:'dog_paw',     slot:'bg',  emoji:'🐾',name:'Pootafdruk', price:20,tags:['dog']},
+  {id:'cat_yarn',    slot:'side',emoji:'🧶',name:'Wollen Bol', price:15,tags:['cat']},
+  {id:'cat_fish',    slot:'side',emoji:'🐟',name:'Visje',      price:15,tags:['cat']},
+  {id:'cat_moon',    slot:'bg',  emoji:'🌙',name:'Maantje',    price:25,tags:['cat']},
+  {id:'fox_leaf',    slot:'bg',  emoji:'🍂',name:'Herfstblad', price:20,tags:['fox']},
+  {id:'fox_acorn',   slot:'side',emoji:'🌰',name:'Eikel',      price:15,tags:['fox']},
+  {id:'bun_carrot',  slot:'side',emoji:'🥕',name:'Wortel',     price:15,tags:['bunny']},
+  {id:'bun_clover',  slot:'side',emoji:'🍀',name:'Klavertje',  price:15,tags:['bunny']},
+  {id:'bear_honey',  slot:'side',emoji:'🍯',name:'Honing',     price:20,tags:['bear']},
+  {id:'bear_forest', slot:'bg',  emoji:'🌲',name:'Bos',        price:25,tags:['bear']},
+  {id:'pan_bamboo',  slot:'side',emoji:'🎋',name:'Bamboe',     price:20,tags:['panda']},
+  {id:'pan_yin',     slot:'bg',  emoji:'☯️',name:'Yin Yang',   price:30,tags:['panda']},
+  {id:'dino_volcano',slot:'bg',  emoji:'🌋',name:'Vulkaan',    price:35,tags:['dino']},
+  {id:'dino_leaf',   slot:'hat', emoji:'🌿',name:'Blad',       price:20,tags:['dino']},
+  {id:'uni_magic',   slot:'bg',  emoji:'✨',name:'Magie',      price:40,tags:['uni']},
+  {id:'uni_gem',     slot:'hat', emoji:'🌟',name:'Mag. Ster',  price:50,tags:['uni']},
+];
+let ownedPets={}, ownedAccs={}, activePet=null, equipped={hat:null,neck:null,side:null,bg:null}, shopPetId=null;
+
+function renderShop(){ renderPets(); if(shopPetId) renderAccs(shopPetId); }
+function shopItem(owned,active,emoji,name,owned2,price,cb){
+  const div=document.createElement('div');
+  div.className='shop-item'+(owned?' owned':'')+(active?' equipped':'');
+  div.innerHTML=`${active?'<span class="top-badge purple">Actief</span>':owned?'<span class="top-badge green">✔</span>':''}<span class="item-emoji">${emoji}</span><div class="item-name">${name}</div>${owned2}`;
+  div.onclick=cb; return div;
+}
+function renderPets(){
+  const g=document.getElementById('petsGrid'); g.innerHTML='';
+  PETS.forEach(pet=>{
+    const owned=ownedPets[pet.id],isActive=activePet===pet.id;
+    const sub=owned?`<div style="color:var(--green);font-weight:800;font-size:.72rem;margin-top:2px">${isActive?'Mijn huisdier':'Klik = selecteer'}</div>`:`<div class="item-price">🪙 ${pet.price}</div>`;
+    g.appendChild(shopItem(owned,isActive,pet.emoji,pet.name,sub,pet.price,()=>clickPet(pet)));
+  });
+}
+function clickPet(pet){
+  if(ownedPets[pet.id]){ activePet=pet.id; equipped={hat:null,neck:null,side:null,bg:null}; shopPetId=pet.id; renderPets(); showAccPanel(pet); toast(`🐾 ${pet.name} is jouw huisdier!`); saveGame(); }
+  else { if(coins<pet.price){toast(`🪙 Niet genoeg munten! (nodig: ${pet.price})`);return;} coins-=pet.price; updateScorebar(); ownedPets[pet.id]=true; activePet=pet.id; equipped={hat:null,neck:null,side:null,bg:null}; shopPetId=pet.id; renderPets(); showAccPanel(pet); doConfetti(); toast(`🎉 ${pet.name} gekocht!`); saveGame(); }
+}
+function showAccPanel(pet){ document.getElementById('accSection').style.display=''; document.getElementById('accPetLabel').textContent=pet.emoji+' '+pet.name; renderAccs(pet.id); }
+function renderAccs(petId){
+  const pet=PETS.find(p=>p.id===petId); const g=document.getElementById('accGrid'); g.innerHTML='';
+  const rel=ACCS.filter(a=>a.tags.some(t=>pet.tags.includes(t)));
+  [{key:'hat',label:'🎩 Hoed'},{key:'neck',label:'🎀 Nek'},{key:'side',label:'⭐ Naast'},{key:'bg',label:'✨ Achtergrond'}].forEach(({key,label})=>{
+    const items=rel.filter(a=>a.slot===key); if(!items.length)return;
+    const lbl=document.createElement('div'); lbl.className='slot-label'; lbl.textContent=label; g.appendChild(lbl);
+    items.forEach(acc=>{
+      const owned=ownedAccs[acc.id],isEq=equipped[acc.slot]===acc.id;
+      const sub=owned?`<div style="color:var(--purple);font-weight:800;font-size:.7rem;margin-top:2px">${isEq?'Aan':'Klik = aan/uit'}</div>`:`<div class="item-price">🪙 ${acc.price}</div>`;
+      g.appendChild(shopItem(owned,isEq,acc.emoji,acc.name,sub,acc.price,()=>clickAcc(acc,petId)));
+    });
+  });
+}
+function clickAcc(acc,petId){
+  if(!activePet){toast('Koop eerst een huisdier!');return;}
+  if(ownedAccs[acc.id]){ equipped[acc.slot]=(equipped[acc.slot]===acc.id)?null:acc.id; renderAccs(petId); toast(equipped[acc.slot]?`${acc.emoji} Aangedaan!`:`${acc.emoji} Uitgedaan`); saveGame(); }
+  else { if(coins<acc.price){toast(`🪙 Niet genoeg munten! (nodig: ${acc.price})`);return;} coins-=acc.price; updateScorebar(); ownedAccs[acc.id]=true; equipped[acc.slot]=acc.id; renderAccs(petId); toast(`🎉 ${acc.name} gekocht & aangedaan!`); saveGame(); }
+}
+
+// ═══════════════════════════════════════
+//  FLASH-STYLE INTERACTIVE PET SCENE
+// ═══════════════════════════════════════
+let sceneLoop=null, nightMode=false;
+
+// Particle system
+const particles=[];
+function spawnParticles(x,y,emoji,count=6){
+  for(let i=0;i<count;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=1.5+Math.random()*2.5;
+    particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-2,emoji,life:1,decay:0.018+Math.random()*0.012,rot:Math.random()*Math.PI*2,rspeed:(Math.random()-.5)*0.15});
+  }
+}
+
+// Tamagotchi-stijl interacties
+// cost = munten af, delta = blijheidsboost, anim = pet animatie, fx = special canvas effect
+const ACTIONS={
+  feed:   {cost:5, delta:12, anim:'eat',     fx:'crumbs',   items:['🍪','🍖','🥩','🍗','🥕','🦴'], msg:'😋 Lekker eten!',  av:'😄'},
+  drink:  {cost:3, delta:8,  anim:'drink',   fx:'drops',    items:['💧','🥛'],                      msg:'😊 Slurp slurp!',  av:'😊'},
+  bath:   {cost:8, delta:15, anim:'bath',    fx:'bubbles',  items:['🫧','💦','🌸','✨'],            msg:'🛁 Heerlijk fris!',av:'😄'},
+  play:   {cost:4, delta:10, anim:'jump',    fx:'play',     items:['🎾','🎉','🎊','🎈'],            msg:'😄 Zo leuk!',      av:'🤾'},
+  walk:   {cost:6, delta:12, anim:'walkfar', fx:'footsteps',items:['🐾','🌿','🍃'],                  msg:'🚶 Lekker wandelen!',av:'🚶'},
+  outside:{cost:4, delta:9,  anim:'sniff',   fx:'leaves',   items:['🌳','🌻','🍄','🌼','🦋'],       msg:'🌳 Buiten is fijn!',av:'😊'},
+  hug:    {cost:0, delta:14, anim:'wiggle',  fx:'hearts',   items:['❤️','💕','💝','💖'],            msg:'🥰 Knuffel!',      av:'🥰'},
+  sleep:  {cost:0, delta:18, anim:'sleep',   fx:'zzz',      items:['💤','😴','⭐','🌙'],            msg:'😴 Welterusten…',  av:'🥱'},
+  praise: {cost:0, delta:8,  anim:'happy',   fx:'sparkles', items:['⭐','🌟','✨','🏆'],            msg:'🌟 Goed gedaan!',  av:'👏'},
+};
+
+// Particle for special FX
+function spawnFX(type, px, py, sz){
+  if(type==='crumbs'){
+    for(let i=0;i<8;i++){ particles.push({x:px+(Math.random()-.5)*sz*0.4,y:py+sz*0.2,vx:(Math.random()-.5)*1.5,vy:-Math.random()*2-1,emoji:'•',life:1,decay:0.025,rot:0,rspeed:0,color:'#8B4513',size:sz*0.18}); }
+  } else if(type==='drops'){
+    for(let i=0;i<6;i++){ particles.push({x:px+(Math.random()-.5)*sz*0.3,y:py-sz*0.1,vx:(Math.random()-.5)*0.8,vy:Math.random()*1.5+1,emoji:'💧',life:1,decay:0.022,rot:0,rspeed:0}); }
+  } else if(type==='bubbles'){
+    for(let i=0;i<14;i++){ particles.push({x:px+(Math.random()-.5)*sz*0.8,y:py+sz*0.3,vx:(Math.random()-.5)*0.6,vy:-Math.random()*2.5-1.5,emoji:'🫧',life:1.2,decay:0.012,rot:0,rspeed:0,size:sz*0.25+Math.random()*sz*0.15}); }
+  } else if(type==='play'){
+    for(let i=0;i<10;i++){ const angle=Math.random()*Math.PI*2; particles.push({x:px,y:py,vx:Math.cos(angle)*3,vy:Math.sin(angle)*3-1,emoji:['🎾','⭐','🎉'][i%3],life:1,decay:0.02,rot:Math.random()*Math.PI*2,rspeed:(Math.random()-.5)*0.3}); }
+  } else if(type==='footsteps'){
+    for(let i=0;i<5;i++){ particles.push({x:px-sz*0.5+i*sz*0.15,y:py+sz*0.5,vx:0,vy:0,emoji:'🐾',life:1,decay:0.012,rot:0,rspeed:0,size:sz*0.22}); }
+  } else if(type==='leaves'){
+    for(let i=0;i<12;i++){ particles.push({x:px+(Math.random()-.5)*sz,y:py-sz*0.4,vx:(Math.random()-.5)*1.2,vy:Math.random()*0.8+0.3,emoji:['🍃','🌿','🍂'][i%3],life:1.4,decay:0.01,rot:Math.random()*Math.PI*2,rspeed:(Math.random()-.5)*0.1}); }
+  } else if(type==='hearts'){
+    for(let i=0;i<10;i++){ particles.push({x:px+(Math.random()-.5)*sz*0.6,y:py-sz*0.2,vx:(Math.random()-.5)*0.8,vy:-Math.random()*2-0.5,emoji:['❤️','💕','💖'][i%3],life:1.3,decay:0.013,rot:0,rspeed:(Math.random()-.5)*0.05}); }
+  } else if(type==='zzz'){
+    for(let i=0;i<3;i++){ setTimeout(()=>{ if(activePet) particles.push({x:px+sz*0.3+i*sz*0.18,y:py-sz*0.55-i*sz*0.18,vx:0.2,vy:-0.4,emoji:'💤',life:1.6,decay:0.008,rot:0,rspeed:0,size:sz*(0.3+i*0.12)}); },i*500); }
+  } else if(type==='sparkles'){
+    for(let i=0;i<14;i++){ const angle=Math.random()*Math.PI*2; const r=sz*0.3+Math.random()*sz*0.5; particles.push({x:px+Math.cos(angle)*r,y:py+Math.sin(angle)*r,vx:Math.cos(angle)*0.4,vy:Math.sin(angle)*0.4-1,emoji:['⭐','✨','🌟'][i%3],life:1.2,decay:0.018,rot:Math.random()*Math.PI*2,rspeed:(Math.random()-.5)*0.2}); }
+  }
+}
+
+// Avatar walk state
+const AV={x:60,y:0,vx:0,dir:1,anim:'idle',animT:0,targetX:60,walking:false};
+// Pet state — uitgebreid met meer animatie-states
+const PS={x:260,y:0,vx:1.0,dir:1,anim:'walk',animT:0,bubble:null,bubbleT:0,
+  // sleep state
+  sleeping:false, sleepT:0,
+  // bath state
+  inBath:false, bathT:0,
+  // eat/drink state
+  eatItem:null, eatT:0,
+  // walk far state
+  walkFar:false, walkFarT:0
+};
+
+// Avatar reaction emoji overlay
+let avReaction=null, avReactionT=0;
+
+function toggleTime(){
+  nightMode=!nightMode;
+  document.getElementById('timeBtn').textContent=nightMode?'☀️ Dag':'🌙 Nacht';
+}
+
+function startScene(){
+  const canvas=document.getElementById('petCanvas');
+  if(!canvas||!activePet) return;
+  if(sceneLoop){ cancelAnimationFrame(sceneLoop); sceneLoop=null; }
+  const W=Math.max(canvas.parentElement?.offsetWidth||0,300);
+  canvas.width=W; canvas.height=Math.round(W*220/420);
+  const GY=canvas.height*0.74;
+  PS.x=W*0.62; PS.y=GY; PS.vx=0.9; PS.dir=1; PS.anim='walk'; PS.animT=0;
+  AV.x=W*0.15; AV.y=GY; AV.targetX=W*0.15; AV.anim='idle'; AV.animT=0; AV.dir=1;
+  PS.bubble=null; PS.bubbleT=0; particles.length=0; avReaction=null;
+
+  canvas.onclick=(e)=>{
+    const rect=canvas.getBoundingClientRect();
+    const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    const cx=(e.clientX-rect.left)*sx, cy=(e.clientY-rect.top)*sy;
+    const hint=document.getElementById('sceneTapHint'); if(hint) hint.style.opacity='0';
+    // clicked pet?
+    if(Math.sqrt((cx-PS.x)**2+(cy-PS.y)**2)<55){
+      // tap = free knuffel
+      interact('hug');
+      return;
+    }
+    // clicked avatar? → wave
+    if(Math.sqrt((cx-AV.x)**2+(cy-AV.y)**2)<50){
+      avReaction='👋'; avReactionT=80;
+      PS.bubble='😄 Hallo!'; PS.bubbleT=100;
+      return;
+    }
+    // else move avatar toward click
+    AV.targetX=Math.max(30,Math.min(canvas.width-30,cx));
+    AV.anim='walk'; AV.walking=true;
+  };
+  function loop(){ drawScene(canvas); sceneLoop=requestAnimationFrame(loop); }
+  loop();
+}
+
+function drawScene(canvas){
+  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height;
+  const GY=H*0.74;
+  ctx.clearRect(0,0,W,H);
+
+  // ── SKY ──
+  if(nightMode){
+    const sky=ctx.createLinearGradient(0,0,0,GY);
+    sky.addColorStop(0,'#0a0a2e'); sky.addColorStop(1,'#1a1a5e');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,GY);
+    // stars
+    ctx.fillStyle='white';
+    for(let i=0;i<28;i++){
+      const sx=(i*137.5)%W, sy=(i*57.3)%(GY*0.85);
+      const blink=0.5+0.5*Math.sin(PS.animT*0.04+i);
+      ctx.globalAlpha=0.5+blink*0.5;
+      ctx.beginPath(); ctx.arc(sx,sy,0.8+blink*0.7,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    // moon
+    ctx.fillStyle='#FFF8CC';
+    ctx.beginPath(); ctx.arc(W*0.82,H*0.12,H*0.09,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#0a0a2e'; ctx.beginPath(); ctx.arc(W*0.82+H*0.04,H*0.09,H*0.075,0,Math.PI*2); ctx.fill();
+  } else {
+    const sky=ctx.createLinearGradient(0,0,0,GY);
+    sky.addColorStop(0,'#5BBFE8'); sky.addColorStop(1,'#B8E8FF');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,GY);
+    // sun with glow
+    ctx.save();
+    const sg=ctx.createRadialGradient(W*0.84,H*0.11,0,W*0.84,H*0.11,H*0.18);
+    sg.addColorStop(0,'rgba(255,220,50,.4)'); sg.addColorStop(1,'rgba(255,220,50,0)');
+    ctx.fillStyle=sg; ctx.fillRect(W*0.6,0,W*0.4,H*0.35); ctx.restore();
+    ctx.fillStyle='#FFD93D'; ctx.beginPath(); ctx.arc(W*0.84,H*0.11,H*0.09,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#FFE878'; ctx.beginPath(); ctx.arc(W*0.84,H*0.11,H*0.065,0,Math.PI*2); ctx.fill();
+    // clouds
+    drawCloud(ctx,W*0.07,H*0.1,H*0.4,PS.animT);
+    drawCloud(ctx,W*0.45,H*0.07,H*0.32,PS.animT*0.7);
+    drawCloud(ctx,W*0.68,H*0.14,H*0.25,PS.animT*0.5);
+  }
+
+  // ── GROUND ──
+  const gc=nightMode?['#2a5a2a','#1a3a1a']:['#7BC67B','#5A9E5A'];
+  const gnd=ctx.createLinearGradient(0,GY,0,H);
+  gnd.addColorStop(0,gc[0]); gnd.addColorStop(1,gc[1]);
+  ctx.fillStyle=gnd; ctx.fillRect(0,GY,W,H-GY);
+
+  // ground line
+  ctx.strokeStyle=nightMode?'rgba(255,255,255,.08)':'rgba(0,0,0,.08)';
+  ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,GY); ctx.lineTo(W,GY); ctx.stroke();
+
+  // flowers / fireflies
+  if(nightMode){
+    for(let i=0;i<12;i++){
+      const fx=(i*71.3+30)%W, fy=GY-5+(i%3)*4;
+      const flicker=0.5+0.5*Math.sin(PS.animT*0.08+i*1.3);
+      ctx.save(); ctx.globalAlpha=flicker;
+      ctx.fillStyle='#FFFF88';
+      ctx.beginPath(); ctx.arc(fx,fy,1.5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  } else {
+    [[0.1,GY-2],[0.28,GY-4],[0.55,GY-2],[0.73,GY-5],[0.9,GY-2]].forEach(([fx,fy])=>{
+      ctx.font=Math.max(13,H*0.072)+'px serif'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.fillText(['🌸','🌼','🌺','🌻','🌷'][ Math.floor(fx*10)%5 ], W*fx, fy);
+    });
+  }
+
+  // ── MOVE AVATAR ──
+  AV.animT++;
+  if(AV.walking){
+    const dx=AV.targetX-AV.x;
+    AV.dir=dx>0?1:-1;
+    if(Math.abs(dx)<3){ AV.x=AV.targetX; AV.walking=false; AV.anim='idle'; AV.animT=0; }
+    else { AV.x+=AV.dir*2.2; AV.anim='walk'; }
+    // arrived near pet? trigger meet
+    if(Math.abs(AV.x-PS.x)<70 && !PS.bubbleT){
+      PS.bubble='😄 Hoi!'; PS.bubbleT=80;
+      avReaction='👋'; avReactionT=80;
+    }
+  } else {
+    // idle gentle sway
+    if(Math.random()<0.002){ AV.anim='wave'; AV.animT=0; }
+    if(AV.anim==='wave'&&AV.animT>60){ AV.anim='idle'; }
+  }
+
+  // ── MOVE PET ──
+  PS.animT++;
+  // Decrement state timers
+  if(PS.sleepT>0) PS.sleepT--;
+  if(PS.bathT>0) PS.bathT--; else PS.inBath=false;
+  if(PS.eatT>0) PS.eatT--; else PS.eatItem=null;
+  if(PS.walkFarT>0) PS.walkFarT--; else PS.walkFar=false;
+  if(PS.sleepT<=0 && PS.sleeping) PS.sleeping=false;
+
+  if(PS.anim==='walk'){
+    PS.x+=PS.vx*PS.dir;
+    if(PS.x>W-50) PS.dir=-1;
+    if(PS.x<50)   PS.dir= 1;
+    if(Math.random()<0.003){ PS.anim='idle'; PS.animT=0; }
+    // approach avatar occasionally
+    if(Math.random()<0.0015){ PS.dir=AV.x>PS.x?1:-1; }
+  } else if(PS.anim==='idle'){
+    if(PS.animT>90){ PS.anim='walk'; PS.animT=0; }
+    PS.dir=AV.x>PS.x?1:-1;
+  } else if(PS.anim==='jump'){ PS.y=GY-Math.abs(Math.sin(PS.animT/40*Math.PI))*H*0.28; if(PS.animT>40){PS.anim='walk';PS.y=GY;PS.animT=0;} }
+  else if(PS.anim==='spin'){ if(PS.animT>50){PS.anim='walk';PS.animT=0;} }
+  else if(PS.anim==='wiggle'){ PS.x+=Math.sin(PS.animT*0.35)*2.5; if(PS.animT>60){PS.anim='walk';PS.animT=0;} }
+  else if(PS.anim==='happy'){ PS.y=GY-Math.abs(Math.sin(PS.animT*0.18))*H*0.2; if(PS.animT>90){PS.anim='walk';PS.y=GY;PS.animT=0;} }
+  // NEW STATES
+  else if(PS.anim==='eat' || PS.anim==='drink'){
+    // small bobbing while eating
+    PS.y=GY-Math.abs(Math.sin(PS.animT*0.3))*4;
+    if(PS.animT>80){ PS.anim='walk'; PS.y=GY; PS.animT=0; }
+  }
+  else if(PS.anim==='bath'){
+    // stay in place, slight wiggle
+    PS.x += Math.sin(PS.animT*0.25)*0.3;
+    PS.y=GY-Math.abs(Math.sin(PS.animT*0.12))*3;
+    if(PS.animT>140){ PS.anim='walk'; PS.y=GY; PS.animT=0; PS.inBath=false; }
+    // continuously spawn bubbles
+    if(PS.animT%18===0) particles.push({x:PS.x+(Math.random()-.5)*40,y:PS.y+5,vx:(Math.random()-.5)*0.5,vy:-Math.random()*1.5-1,emoji:'🫧',life:1.2,decay:0.012,rot:0,rspeed:0,size:14+Math.random()*8});
+  }
+  else if(PS.anim==='walkfar'){
+    // walk across full canvas, faster
+    PS.x+=2.5*PS.dir;
+    if(PS.x>W-50) PS.dir=-1;
+    if(PS.x<50) PS.dir=1;
+    // leave pawprints
+    if(PS.animT%22===0) particles.push({x:PS.x,y:GY+10,vx:0,vy:0,emoji:'🐾',life:1.5,decay:0.008,rot:0,rspeed:0,size:16});
+    if(PS.animT>200){ PS.anim='walk'; PS.animT=0; PS.walkFar=false; }
+  }
+  else if(PS.anim==='sleep'){
+    // stay still, no bob
+    PS.y=GY;
+    // Periodically spawn Zzz
+    if(PS.animT%80===0) particles.push({x:PS.x+25,y:PS.y-45,vx:0.3,vy:-0.5,emoji:'💤',life:1.8,decay:0.008,rot:0,rspeed:0,size:20});
+    if(PS.animT>200){ PS.anim='walk'; PS.animT=0; PS.sleeping=false; }
+  }
+  else if(PS.anim==='sniff'){
+    // bob head down for sniffing
+    PS.y=GY+Math.abs(Math.sin(PS.animT*0.15))*3;
+    PS.x += Math.sin(PS.animT*0.08)*0.4;
+    if(PS.animT>100){ PS.anim='walk'; PS.y=GY; PS.animT=0; }
+  }
+
+  // ── DRAW AVATAR ──
+  const avBody=AV_BODIES[avatar.bodyIdx]||'🧒';
+  const avHat=AV_HATS[avatar.hatIdx]?.e||'';
+  const avAcc=AV_ACCS[avatar.accIdx]?.e||'';
+  const avSz=H*0.34;
+  const avBob=AV.anim==='walk'?Math.sin(AV.animT*0.28)*2.5:0;
+  const avWave=AV.anim==='wave'?Math.sin(AV.animT*0.18)*0.18:0;
+  ctx.save();
+  ctx.translate(AV.x, AV.y+avBob);
+  if(AV.dir===-1) ctx.scale(-1,1);
+  if(avWave) ctx.rotate(avWave);
+  // shadow
+  ctx.save(); ctx.fillStyle='rgba(0,0,0,.12)'; ctx.beginPath(); ctx.ellipse(0,avSz*0.52,avSz*0.38,avSz*0.09,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+  ctx.font=avSz+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(avBody,0,0);
+  if(avHat){ ctx.font=avSz*0.5+'px serif'; ctx.fillText(avHat,0,-avSz*0.6); }
+  if(avAcc){ ctx.font=avSz*0.38+'px serif'; ctx.fillText(avAcc,avSz*0.65,0); }
+  ctx.restore();
+
+  // avatar reaction emoji
+  if(avReaction&&avReactionT>0){
+    const alpha=Math.min(1,avReactionT/20);
+    const ry=AV.y-avSz*0.9-(80-avReactionT)*0.5;
+    ctx.save(); ctx.globalAlpha=alpha; ctx.font=avSz*0.55+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(avReaction,AV.x,ry); ctx.restore();
+    avReactionT--;
+  }
+
+  // avatar name
+  ctx.font=`800 ${Math.max(10,H*0.065)}px Nunito,sans-serif`;
+  ctx.fillStyle=nightMode?'#D0B0FF':'#6B3FA0'; ctx.textAlign='center';
+  ctx.fillText(playerName||'Jij',AV.x,AV.y+avSz*0.62);
+
+  // ── DRAW PET ──
+  const pet=PETS.find(p=>p.id===activePet);
+  const Hq=equipped.hat?ACCS.find(a=>a.id===equipped.hat):null;
+  const Nq=equipped.neck?ACCS.find(a=>a.id===equipped.neck):null;
+  const Sq=equipped.side?ACCS.find(a=>a.id===equipped.side):null;
+  const Bq=equipped.bg?ACCS.find(a=>a.id===equipped.bg):null;
+  const sz=H*0.38;
+  PS.sz=sz;
+  const bob=PS.anim==='walk'?Math.sin(PS.animT*0.22)*2.5:0;
+
+  // ── BATH TUB (drawn before pet so pet sits inside) ──
+  if(PS.inBath){
+    ctx.save();
+    // tub bottom
+    ctx.fillStyle='#E8F4FF';
+    ctx.strokeStyle='#88BBE0'; ctx.lineWidth=3;
+    const tubW=sz*1.4, tubH=sz*0.55;
+    const tubX=PS.x-tubW/2, tubY=PS.y+sz*0.05;
+    // rounded tub shape
+    ctx.beginPath();
+    ctx.moveTo(tubX,tubY);
+    ctx.quadraticCurveTo(tubX-10,tubY+tubH/2,tubX+12,tubY+tubH);
+    ctx.lineTo(tubX+tubW-12,tubY+tubH);
+    ctx.quadraticCurveTo(tubX+tubW+10,tubY+tubH/2,tubX+tubW,tubY);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // water line
+    ctx.fillStyle='rgba(120,200,255,.6)';
+    ctx.beginPath();
+    ctx.moveTo(tubX+5,tubY+8);
+    ctx.lineTo(tubX+tubW-5,tubY+8);
+    ctx.quadraticCurveTo(tubX+tubW+5,tubY+tubH/2,tubX+tubW-12,tubY+tubH-2);
+    ctx.lineTo(tubX+12,tubY+tubH-2);
+    ctx.quadraticCurveTo(tubX-5,tubY+tubH/2,tubX+5,tubY+8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.save(); ctx.translate(PS.x,PS.y+bob);
+  if(PS.anim==='spin') ctx.rotate((PS.animT/50)*Math.PI*2);
+  if(PS.anim==='sleep') ctx.rotate(0.35); // lying down tilt
+  if(PS.dir===-1) ctx.scale(-1,1);
+
+  // bg accessory
+  if(Bq){ ctx.save(); ctx.globalAlpha=.28; ctx.font=sz*0.9+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(Bq.emoji,0,0); ctx.restore(); }
+  // shadow
+  ctx.save(); ctx.fillStyle='rgba(0,0,0,.1)'; ctx.beginPath(); ctx.ellipse(0,sz*0.55,sz*0.42,sz*0.09,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+  // body
+  ctx.font=sz+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(pet.emoji,0,0);
+  // hat
+  if(Hq){ ctx.font=sz*0.52+'px serif'; ctx.fillText(Hq.emoji,0,-sz*0.63); }
+  // neck
+  if(Nq){ ctx.font=sz*0.4+'px serif'; ctx.fillText(Nq.emoji,0,sz*0.47); }
+  // side
+  if(Sq){ const sd=PS.dir===-1?-1:1; ctx.font=sz*0.4+'px serif'; ctx.fillText(Sq.emoji,sz*0.72*sd,0); }
+  ctx.restore();
+
+  // ── EAT/DRINK item near pet mouth ──
+  if(PS.eatItem && PS.eatT>0){
+    const eBob=Math.sin(PS.eatT*0.4)*3;
+    const ex=PS.x + sz*0.4*PS.dir;
+    const ey=PS.y + sz*0.1 + eBob;
+    ctx.save();
+    ctx.font=sz*0.4+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.globalAlpha=Math.min(1, PS.eatT/15);
+    ctx.fillText(PS.eatItem, ex, ey);
+    ctx.restore();
+  }
+
+  // pet name
+  ctx.font=`800 ${Math.max(10,H*0.065)}px Nunito,sans-serif`;
+  ctx.fillStyle=nightMode?'#FFBB88':'#CC6600'; ctx.textAlign='center';
+  ctx.fillText(pet.name,PS.x,GY+sz*0.62);
+
+  // ── SPEECH BUBBLE (pet) ──
+  if(PS.bubble&&PS.bubbleT>0){
+    const bx=PS.x, by=PS.y+bob-sz*0.85;
+    const fsz=Math.max(11,H*0.075);
+    ctx.font=`800 ${fsz}px Nunito,sans-serif`;
+    const tw=ctx.measureText(PS.bubble).width, bw=tw+20, bh=fsz*1.8;
+    const bxL=Math.min(Math.max(bx-bw/2,3),W-bw-3);
+    const alpha=Math.min(1,PS.bubbleT/15);
+    ctx.save(); ctx.globalAlpha=alpha;
+    ctx.fillStyle='white'; rrect(ctx,bxL,by-bh/2,bw,bh,10); ctx.fill();
+    ctx.strokeStyle='#E0E0E0'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx-6,by+bh/2); ctx.lineTo(bx+6,by+bh/2); ctx.lineTo(bx,by+bh/2+9); ctx.closePath();
+    ctx.fillStyle='white'; ctx.fill(); ctx.strokeStyle='#E0E0E0'; ctx.stroke();
+    ctx.fillStyle='#333'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(PS.bubble,bxL+bw/2,by);
+    ctx.restore();
+    PS.bubbleT--;
+  }
+
+  // ── HEART EFFECT when close ──
+  const dist=Math.abs(PS.x-AV.x);
+  if(dist<90&&PS.anim!=='spin'){
+    const heartAlpha=Math.max(0,(90-dist)/90)*0.6;
+    ctx.save(); ctx.globalAlpha=heartAlpha;
+    ctx.font=Math.max(14,H*0.08)+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    const hx=(PS.x+AV.x)/2, hy=GY-H*0.12-Math.sin(PS.animT*0.05)*6;
+    ctx.fillText('💕',hx,hy);
+    ctx.restore();
+  }
+
+  // ── PARTICLES ──
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx; p.y+=p.vy;
+    // bubbles and Zzz float up (no gravity)
+    if(p.emoji!=='🫧' && p.emoji!=='💤') p.vy+=0.1;
+    p.life-=p.decay; p.rot+=p.rspeed;
+    if(p.life<=0){ particles.splice(i,1); continue; }
+    ctx.save(); ctx.globalAlpha=Math.min(1,p.life); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+    const fsize = p.size || Math.max(12,H*0.08);
+    if(p.color){
+      // dot-style particle (crumbs)
+      ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(0,0,fsize/3,0,Math.PI*2); ctx.fill();
+    } else {
+      ctx.font=`${fsize}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(p.emoji,0,0);
+    }
+    ctx.restore();
+  }
+}
+
+function drawCloud(ctx,x,y,s,t){
+  const drift=Math.sin(t*0.005)*s*0.1;
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.beginPath();
+  ctx.arc(x+drift,y,s*0.5,0,Math.PI*2); ctx.arc(x+s*0.48+drift,y-s*0.18,s*0.4,0,Math.PI*2);
+  ctx.arc(x+s*0.9+drift,y,s*0.46,0,Math.PI*2); ctx.arc(x+s*0.42+drift,y+s*0.18,s*0.36,0,Math.PI*2);
+  ctx.fill();
+}
+function rrect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
+
+function interact(type){
+  if(!activePet){ toast('Koop eerst een huisdier!'); return; }
+  const a=ACTIONS[type]; if(!a) return;
+  // check cost
+  if(a.cost>0 && coins<a.cost){ toast(`🪙 Niet genoeg munten! (nodig: ${a.cost})`); return; }
+
+  // pay
+  if(a.cost>0){ coins-=a.cost; updateScorebar(); saveGame(); }
+
+  // wake from sleep if any other action
+  if(type!=='sleep' && PS.sleeping){ PS.sleeping=false; PS.sleepT=0; }
+
+  changeMood(a.delta);
+  PS.anim=a.anim; PS.animT=0;
+  PS.bubble=a.msg; PS.bubbleT=140;
+  avReaction=a.av; avReactionT=100;
+
+  // action-specific setup
+  if(type==='hug'){
+    // walk toward pet first
+    AV.targetX=PS.x>AV.x?PS.x-65:PS.x+65; AV.walking=true;
+  } else if(type==='feed' || type==='drink'){
+    PS.eatItem=a.items[randInt(0,a.items.length-1)];
+    PS.eatT=80;
+  } else if(type==='sleep'){
+    PS.sleeping=true; PS.sleepT=200;
+  } else if(type==='bath'){
+    PS.inBath=true; PS.bathT=140;
+  } else if(type==='walk'){
+    PS.walkFar=true; PS.walkFarT=200;
+    AV.targetX=PS.x>AV.x?PS.x-50:PS.x+50; AV.walking=true;
+  }
+
+  // spawn FX particles
+  spawnFX(a.fx, PS.x, PS.y, PS.sz||80);
+
+  // UI feedback
+  const item=a.items[randInt(0,a.items.length-1)];
+  document.getElementById('interactResult').textContent=item+' '+a.msg+(a.cost>0?` (-🪙${a.cost})`:'');
+  const hint=document.getElementById('sceneTapHint'); if(hint) hint.style.opacity='0';
+
+  if(a.cost===0){
+    toast(`💕 +${a.delta}% blij!`);
+  } else {
+    toast(`🪙 -${a.cost} • +${a.delta}% blij`);
+  }
+}
+
+function renderMyPet(){
+  const box=document.getElementById('petShowcase');
+  const scene=document.getElementById('petScene');
+  const sec=document.getElementById('myAccSection');
+
+  if(!activePet){
+    box.style.display=''; scene.style.display='none';
+    return;
+  }
+  box.style.display='none'; scene.style.display='';
+  updateMoodBar();
+  setTimeout(startScene,60);
+
+  sec.style.display='';
+  const mg=document.getElementById('myAccGrid'); mg.innerHTML='';
+  const pet=PETS.find(p=>p.id===activePet);
+  const myAccs=ACCS.filter(a=>ownedAccs[a.id]&&a.tags.some(t=>pet.tags.includes(t)));
+  if(!myAccs.length){ mg.innerHTML='<div style="color:#aaa;font-weight:700;font-size:.85rem;padding:8px 0;grid-column:1/-1">Koop accessoires in de Winkel 🎀</div>'; return; }
+  const SL={hat:'🎩 Hoed',neck:'🎀 Nek',side:'⭐ Naast',bg:'✨ Achtergrond'};
+  ['hat','neck','side','bg'].forEach(slot=>{
+    const items=myAccs.filter(a=>a.slot===slot); if(!items.length) return;
+    const lbl=document.createElement('div'); lbl.className='slot-label'; lbl.textContent=SL[slot]; mg.appendChild(lbl);
+    items.forEach(acc=>{
+      const isEq=equipped[acc.slot]===acc.id;
+      const div=document.createElement('div'); div.className='shop-item owned'+(isEq?' equipped':'');
+      div.innerHTML=`${isEq?'<span class="top-badge purple">Aan</span>':''}<span class="item-emoji">${acc.emoji}</span><div class="item-name">${acc.name}</div><div style="color:var(--purple);font-weight:800;font-size:.7rem;margin-top:2px">${isEq?'Aan':'Klik'}</div>`;
+      div.onclick=()=>{ equipped[acc.slot]=(equipped[acc.slot]===acc.id)?null:acc.id; renderMyPet(); toast(equipped[acc.slot]?`${acc.emoji} Aangedaan!`:`${acc.emoji} Uitgedaan`); };
+      mg.appendChild(div);
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+//  SAVE / LOAD  (localStorage)
+// ═══════════════════════════════════════
+const SAVE_KEY='leeravontuur_v1';
+
+function saveGame(){
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      playerName, avatar, score, coins, petMood,
+      ownedPets, ownedAccs, activePet, equipped,
+      taalMode,
+      // flags so onboarding is skipped on reload
+      onboardingDone: true
+    }));
+  } catch(e){ /* storage full / private mode */ }
+}
+
+function loadGame(){
+  try {
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw) return false;
+    const d=JSON.parse(raw);
+    if(!d.onboardingDone) return false;
+    playerName = d.playerName||'';
+    avatar     = d.avatar||{bodyIdx:0,skinColor:'#FDDBB4',hatIdx:0,accIdx:0};
+    score      = d.score||0;
+    coins      = d.coins||0;
+    petMood    = d.petMood||60;
+    ownedPets  = d.ownedPets||{};
+    ownedAccs  = d.ownedAccs||{};
+    activePet  = d.activePet||null;
+    equipped   = d.equipped||{hat:null,neck:null,side:null,bg:null};
+    taalMode   = d.taalMode||'fill';
+    return true;
+  } catch(e){ return false; }
+}
+
+// Auto-save every 30 seconds and on key events
+setInterval(saveGame, 30000);
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+
+// Register service worker for PWA offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// Try loading saved game first
+const hasSave = loadGame();
+
+document.getElementById('obNameInput').addEventListener('keydown',e=>{ if(e.key==='Enter') obNext1(); });
+
+if(hasSave){
+  // Skip onboarding, go straight to app
+  document.getElementById('onboarding').style.display='none';
+  applyProfile();
+  updateScorebar();
+  updateMoodBar();
+  nextMath();
+  initTaal();
+  toast(`Welkom terug, ${playerName}! 🎉`);
+} else {
+  obSetStep(1);
+}
+
+// Save when leaving the page
+window.addEventListener('beforeunload', saveGame);
+window.addEventListener('pagehide',     saveGame);
+</script>
+</body>
+</html>
